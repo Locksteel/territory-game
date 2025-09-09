@@ -23,6 +23,12 @@ func get_unit_owner(unit: Unit) -> Player:
 	
 	return null
 
+func get_unit_by_name(name: String, player: Player = null) -> Unit:
+	for unit in units:
+		if unit.name == name and (not player or unit in player.units_owned):
+			return unit
+	return null
+
 func add_player(player: Player):
 	players.append(player)
 

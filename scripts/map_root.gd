@@ -777,10 +777,8 @@ func turn() -> int:
 								var selected_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
 								var selected_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(selected_id)
 
-								for unit: Unit in player.units_owned:
-									if unit.name == selected_name:
-										attacker = unit
-										break
+								# Find attacker
+								attacker = $TerritoryManager.get_unit_by_name(selected_name, player)
 
 								if attacker:
 									#attacker.attack_territory(target)
@@ -861,10 +859,7 @@ func turn() -> int:
 								continue
 
 							# Find attacker
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									attacker = unit
-									break
+							attacker = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							# Find target + owner
 							var enemy_owner: Player
@@ -1007,10 +1002,7 @@ func turn() -> int:
 								continue
 
 							# Find attacker
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									target = unit
-									break
+							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
 								#attacker.attack_unit(target)
@@ -1151,10 +1143,7 @@ func turn() -> int:
 								continue
 
 							# Find unit to move
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									target = unit
-									break
+							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if true: #target:
 								call = Callable(target, "move").bind(destination)
@@ -1224,10 +1213,7 @@ func turn() -> int:
 								continue
 
 							# Find unit
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									target = unit
-									break
+							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
 								#attacker.attack_unit(target)
@@ -1300,10 +1286,7 @@ func turn() -> int:
 								continue
 
 							# Find friendly unit
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									target = unit
-									break
+							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
 								call = Callable(target, "station").bind(territory)
@@ -1375,10 +1358,7 @@ func turn() -> int:
 								continue
 
 							# Find friendly unit
-							for unit: Unit in player.units_owned:
-								if unit.name == friendly_name:
-									target = unit
-									break
+							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
 								call = Callable(target, "unstation").bind(territory)
