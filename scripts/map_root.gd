@@ -1122,7 +1122,7 @@ func turn() -> int:
 								boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(source.id)
 								
 								update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, source, true,
-									func(unit: Unit) -> bool: return unit.stationed == false)
+									func(unit: Unit) -> bool: return not unit.stationed)
 								boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").show()
 							
 							elif boxes["Territory"].get_node("Territory2/Enable").button_pressed:
@@ -1282,7 +1282,8 @@ func turn() -> int:
 							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(territory.id)
 
 							# Populate unit selectors
-							update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, territory, true)
+							update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, territory, true,
+								func(unit: Unit): return not unit.stationed)
 
 							boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").show()
 
