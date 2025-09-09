@@ -1244,7 +1244,7 @@ func turn() -> int:
 
 					# Check if player has any units
 					if not player.units_owned:
-						REMINDER_TEXT.show_message("You can't defend with no units!")
+						REMINDER_TEXT.show_message("You can't station with no units!")
 						continue
 
 					action_info_label.text = "%s: Station a Territory" % player.name
