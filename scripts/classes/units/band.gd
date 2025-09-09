@@ -14,15 +14,14 @@ func band(units : Array[Unit]) -> bool:
 		print("Passed unit array is empty")
 		return false
 	
+	var member_list: Array[Unit] = []
+	
 	var band_offense = 0
 	var band_defense = 0
 	var band_health = 0
 	for unit in units:
 		if unit is not Unit:
 			print("Passed non-unit to unit array")
-			return false
-		if unit.band_unit:
-			print("Passed already banded unit. Unband all units to reband")
 			return false
 		if unit.stationed:
 			print("Passed stationed unit. Unstation all units to band")
@@ -38,13 +37,25 @@ func band(units : Array[Unit]) -> bool:
 	for unit in units:
 		if unit.ability != units[0].ability:
 			band_ability = AbilityType.NONE
-		unit.band_unit = self
+		
+		# Check if banding units are bands themselves
+		if unit is Band and unit.band_unit == unit:
+			# Assign band members to new band
+			for member: Unit in unit.members:
+				member_list.append(member)
+				member.band_unit = self
+			# Set old band to dead
+			unit.health = 0
+			unit.band_unit = null
+		else:
+			member_list.append(unit)
+			unit.band_unit = self
 	
 	self.ability = band_ability
 	self.offense = band_offense
 	self.defense = band_defense
 	self.health = band_health
-	self.members = units
+	self.members = member_list
 	return true
 
 

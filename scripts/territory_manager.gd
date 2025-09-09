@@ -13,6 +13,23 @@ var priority_action_queue: Array[Callable] = []
 var action_queue: Array[Callable] = []
 var last_action_queue: Array[Callable] = []
 
+func cleanup() -> void:
+	for key in territories.keys():
+		territories[key].check_independence()
+	
+	for unit in units:
+		if unit.health <= 0:
+			units.erase(unit)
+			if unit is not Band or unit.band_unit:
+				dead_units.append(unit)
+	
+	clear_actions()
+
+func clear_actions() -> void:
+	priority_action_queue.clear()
+	action_queue.clear()
+	last_action_queue.clear()
+
 func get_territory_by_id(id: int) -> Territory:
 	return territories.get(id)
 
@@ -26,6 +43,12 @@ func get_unit_owner(unit: Unit) -> Player:
 func get_unit_by_name(name: String, player: Player = null) -> Unit:
 	for unit in units:
 		if unit.name == name and (not player or unit in player.units_owned):
+			return unit
+	return null
+
+func get_unit_by_id(id: int) -> Unit:
+	for unit in units:
+		if unit.id == id:
 			return unit
 	return null
 
@@ -71,6 +94,20 @@ func kill_troop(troop: Unit):
 	dead_units.append(troop)
 	units.erase(troop)
 	pass
+
+func band_troops(troops: Array[Unit], band_name: String) -> Band:
+	var territory: Territory = troops[0].current_territory
+	for troop in troops:
+		if troop.current_territory != territory:
+			print("Units passed to band are not on the same territory")
+			return null
+	
+	var band := Band.new(band_name, territory)
+	if not band.band(troops):
+		print("Banding failed")
+		return null
+	
+	return band
 
 func unique_name(name: String) -> bool:
 	for unit in units:

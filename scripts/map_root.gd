@@ -665,14 +665,10 @@ func turn() -> int:
 	# Action info main label
 	var action_info_label: Label = $CanvasLayer/UI/ActionInfo/VBoxContainer/Label
 	# Action info element containers
-	#var boxes["Player"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/Player
-	#var boxes["Territory"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/Territory
-	#var boxes["FriendlyUnit"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/FriendlyUnit
-	#var boxes["EnemyUnit"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/EnemyUnit
-	#var boxes["UnitType"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/UnitType
-	#var boxes["Name"]: VBoxContainer = $CanvasLayer/UI/ActionInfo/VBoxContainer/Name
 	var text_edit: TextEdit = $CanvasLayer/UI/ActionInfo/VBoxContainer/TextEdit
 	var continue_b: Button = $CanvasLayer/UI/ActionInfo/VBoxContainer/HBoxContainer/Continue
+	
+	$TerritoryManager.cleanup()
 	
 	# For each player
 	for player: Player in $TerritoryManager.players:
@@ -1370,7 +1366,88 @@ func turn() -> int:
 							else:
 								REMINDER_TEXT.show_message("Invalid unit selection, try again")
 				"band":
-					pass
+					var unit1: Unit
+					var unit2: Unit
+					var territory: Territory
+
+					# Check if player has any units
+					if player.units_owned.size() < 2:
+						REMINDER_TEXT.show_message("You can't band with fewer than two units!")
+						continue
+
+					action_info_label.text = "%s: Band Units" % player.name
+					boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
+					boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").hide()
+					boxes["FriendlyUnit2"].get_node("FriendlyUnitSelector").hide()
+
+					# Show UI
+					boxes["FriendlyUnit"].show()
+					boxes["FriendlyUnit2"].show()
+					boxes["Territory"].show()
+					boxes["Name"].show()
+					action_info.show()
+
+					while true:
+						var outcome = await wait_for_continue_or_selection(continue_b)
+						
+						var name: String = boxes["Name"].get_node("NameText").text
+
+						if outcome.type == "territory":
+							var terr: Territory = outcome.territory
+							
+							# Check if there are enough friendly units on territory
+							var friendly_unit_count := 0
+							for unit: Unit in $TerritoryManager.units:
+								if (unit.current_territory == territory and
+									$TerritoryManager.get_unit_owner(unit) == player
+								):
+									friendly_unit_count += 1
+							if friendly_unit_count < 2:
+								REMINDER_TEXT.show_message("That territory doesn't have enough troops to band")
+								continue
+							
+							territory = terr
+
+							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(territory.id)
+
+							# Populate unit selectors
+							update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, territory, true)
+							update_unit_selector(boxes["FriendlyUnit2"].get_node("FriendlyUnitSelector"), player, territory, true)
+
+							boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").show()
+							boxes["FriendlyUnit2"].get_node("FriendlyUnitSelector").show()
+
+						elif outcome.type == "continue":
+							if not territory:
+								REMINDER_TEXT.show_message("Select a territory first")
+								continue
+							if not (name and $TerritoryManager.unique_name(name)):
+								REMINDER_TEXT.show_message("Enter a unique name")
+								continue
+
+							var unit1_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
+							var unit1_temp: Unit = $TerritoryManager.get_unit_by_id(unit1_id)
+							var unit2_id: int = boxes["FriendlyUnit2"].get_node("FriendlyUnitSelector").get_selected_id()
+							var unit2_temp: Unit = $TerritoryManager.get_unit_by_id(unit2_id)
+							
+							# Check choice validity
+							if not (unit1_temp and unit2_temp):
+								REMINDER_TEXT.show_message("Select both two friendly units before continuing")
+								continue
+							if unit1_temp == unit2_temp:
+								REMINDER_TEXT.show_message("Select different units")
+								continue
+							
+							# Assign to stable variables
+							unit1 = unit1_temp
+							unit2 = unit2_temp
+							
+							
+							call = Callable($TerritoryManager, "band_troops").bind([unit1, unit2], name)
+							priority = CallPriority.LOW
+							
+							print("Units '%s' and '%s' owned by %s, band into '%s'" % [unit1.name, unit2.name, player.name, name])
+							break
 				"assess":
 					pass
 				"uncover":
