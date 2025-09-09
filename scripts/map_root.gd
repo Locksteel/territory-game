@@ -1299,14 +1299,13 @@ func turn() -> int:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
 								continue
 
-							# Find attacker
+							# Find friendly unit
 							for unit: Unit in player.units_owned:
 								if unit.name == friendly_name:
 									target = unit
 									break
 
 							if target:
-								#attacker.attack_unit(target)
 								call = Callable(target, "station").bind(territory)
 								priority = CallPriority.HIGH
 								
@@ -1315,7 +1314,81 @@ func turn() -> int:
 							else:
 								REMINDER_TEXT.show_message("Invalid unit selection, try again")
 				"unstation":
-					pass
+					var target: Unit
+					var territory: Territory
+
+					# Check if player has any units
+					if not player.units_owned:
+						REMINDER_TEXT.show_message("You can't unstation with no units!")
+						continue
+
+					action_info_label.text = "%s: Unstation a Unit" % player.name
+					boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
+					boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").hide()
+
+					# Show UI
+					boxes["FriendlyUnit"].show()
+					boxes["Territory"].show()
+					action_info.show()
+
+					while true:
+						var outcome = await wait_for_continue_or_selection(continue_b)
+
+						if outcome.type == "territory":
+							var terr: Territory = outcome.territory
+							
+							# Check if player owns selected territory
+							if terr.owner != player:
+								REMINDER_TEXT.show_message("You can only unstation on your own territories")
+								continue
+							
+							# Check if there are any stationed units at all
+							var has_units := false
+							for unit: Unit in $TerritoryManager.units:
+								if unit.current_territory == terr and unit.stationed:
+									has_units = true
+									break
+							if not has_units:
+								REMINDER_TEXT.show_message("That territory has no stationed units")
+								continue
+							
+							territory = terr
+
+							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(territory.id)
+
+							# Populate unit selectors
+							update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, territory, true,
+								func(unit: Unit): return unit.stationed)
+
+							boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").show()
+
+						elif outcome.type == "continue":
+							if not territory:
+								REMINDER_TEXT.show_message("Select a territory first")
+								continue
+
+							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
+							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+
+							if friendly_name == "":
+								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
+								continue
+
+							# Find friendly unit
+							for unit: Unit in player.units_owned:
+								if unit.name == friendly_name:
+									target = unit
+									break
+
+							if target:
+								call = Callable(target, "unstation").bind(territory)
+								priority = CallPriority.HIGH
+								
+								print("Unit '%s' on territory %s, owned by %s, unstations" %
+									[target.name, territory.id, player.name])
+								break
+							else:
+								REMINDER_TEXT.show_message("Invalid unit selection, try again")
 				"band":
 					pass
 				"assess":
