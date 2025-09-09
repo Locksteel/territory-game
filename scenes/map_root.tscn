@@ -1,0 +1,818 @@
+[gd_scene load_steps=19 format=3 uid="uid://dsb3sliyetmax"]
+
+[ext_resource type="Script" path="res://scripts/map_root.gd" id="1_hsy55"]
+[ext_resource type="Script" path="res://scripts/territory_manager.gd" id="2_khk40"]
+[ext_resource type="Script" path="res://scripts/success.gd" id="3_e0xv1"]
+[ext_resource type="Script" path="res://scripts/reminder_text.gd" id="4_0h4v6"]
+[ext_resource type="LabelSettings" uid="uid://bsqfnka11aswk" path="res://fonts/small_label_text.tres" id="5_qjskx"]
+[ext_resource type="LabelSettings" uid="uid://cacfsntwvi28w" path="res://fonts/title_label_text.tres" id="6_121gu"]
+[ext_resource type="LabelSettings" uid="uid://c86fx3uqa5deo" path="res://fonts/medium_label_text.tres" id="6_ksvmw"]
+[ext_resource type="ButtonGroup" uid="uid://dg22a4t3latar" path="res://ui/messages.tres" id="7_5h6mx"]
+[ext_resource type="ButtonGroup" uid="uid://but5r0g53wdea" path="res://ui/attack_defend.tres" id="8_riwiv"]
+[ext_resource type="ButtonGroup" uid="uid://cg0s2aqhj12pp" path="res://ui/recruitment.tres" id="9_b5xpo"]
+[ext_resource type="ButtonGroup" uid="uid://jdgbnffrtpm7" path="res://ui/move_regroup.tres" id="10_113jk"]
+[ext_resource type="ButtonGroup" uid="uid://cw4brkti4ca01" path="res://ui/stationing.tres" id="11_tn6sn"]
+[ext_resource type="ButtonGroup" uid="uid://mn7olja8oxso" path="res://ui/banding.tres" id="12_fcb3n"]
+[ext_resource type="ButtonGroup" uid="uid://b85epnroel4pb" path="res://ui/spying.tres" id="13_q8msi"]
+[ext_resource type="ButtonGroup" uid="uid://djhngfmxxgt52" path="res://ui/treaties.tres" id="14_6trwr"]
+[ext_resource type="ButtonGroup" uid="uid://b2f7ipqm5kq6a" path="res://ui/action_info_territory_selectors.tres" id="16_bwqyw"]
+[ext_resource type="Script" path="res://scripts/action_info.gd" id="16_x4mbb"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jdyj2"]
+
+[node name="MapRoot" type="Node2D"]
+script = ExtResource("1_hsy55")
+
+[node name="TerritoryManager" type="Node" parent="."]
+script = ExtResource("2_khk40")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="PrettyMap" type="TextureRect" parent="CanvasLayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("PlaceholderTexture2D_jdyj2")
+stretch_mode = 6
+
+[node name="SaveLoadUI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SaveSuccess" type="Label" parent="CanvasLayer/SaveLoadUI"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -77.0
+offset_right = 77.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Save Successful!"
+horizontal_alignment = 1
+script = ExtResource("3_e0xv1")
+
+[node name="MainLoad" type="PanelContainer" parent="CanvasLayer/SaveLoadUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -74.0
+offset_top = -33.0
+offset_right = 74.0
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainLoadContainer" type="VBoxContainer" parent="CanvasLayer/SaveLoadUI/MainLoad"]
+layout_mode = 2
+
+[node name="NewGame" type="Button" parent="CanvasLayer/SaveLoadUI/MainLoad/MainLoadContainer"]
+layout_mode = 2
+text = "Create New Game"
+
+[node name="LoadGame" type="Button" parent="CanvasLayer/SaveLoadUI/MainLoad/MainLoadContainer"]
+layout_mode = 2
+text = "Load from Save"
+
+[node name="LoadNew" type="PanelContainer" parent="CanvasLayer/SaveLoadUI"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -75.5
+offset_top = -33.0
+offset_right = 75.5
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LoadNewContainer" type="VBoxContainer" parent="CanvasLayer/SaveLoadUI/LoadNew"]
+layout_mode = 2
+
+[node name="LoadPretty" type="Button" parent="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer"]
+layout_mode = 2
+text = "Load Pretty Map"
+
+[node name="LoadIndex" type="Button" parent="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer"]
+layout_mode = 2
+text = "Load Indexed Map"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer"]
+layout_mode = 2
+
+[node name="Back" type="Button" parent="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Back"
+
+[node name="Continue" type="Button" parent="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continue"
+
+[node name="LoadDialog" type="FileDialog" parent="CanvasLayer/SaveLoadUI"]
+title = "Open a File"
+size = Vector2i(400, 500)
+ok_button_text = "Open"
+file_mode = 0
+filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Image files")
+
+[node name="Save" type="PanelContainer" parent="CanvasLayer/SaveLoadUI"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -96.0
+offset_bottom = 33.0
+grow_horizontal = 0
+
+[node name="Save" type="Button" parent="CanvasLayer/SaveLoadUI/Save"]
+layout_mode = 2
+text = "Save Game"
+
+[node name="SaveDialog" type="FileDialog" parent="CanvasLayer/SaveLoadUI"]
+size = Vector2i(400, 500)
+access = 2
+filters = PackedStringArray("*.tres,*.res ; Godot Resource Files")
+
+[node name="LoadStateDialog" type="FileDialog" parent="CanvasLayer/SaveLoadUI"]
+title = "Open a File"
+size = Vector2i(400, 500)
+ok_button_text = "Open"
+file_mode = 0
+filters = PackedStringArray("*.tres,*.res ; Godot Resource Files")
+
+[node name="UI" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ReminderText" type="Label" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+script = ExtResource("4_0h4v6")
+
+[node name="PlayButton" type="Button" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -90.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Play Game"
+
+[node name="TerritorySetup" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/TerritorySetup"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer"]
+layout_mode = 2
+
+[node name="Terrain" type="VBoxContainer" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer/Terrain"]
+layout_mode = 2
+text = "Terrain"
+label_settings = ExtResource("5_qjskx")
+
+[node name="TerrainSelector" type="OptionButton" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer/Terrain"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Flatland"
+popup/item_1/text = "Mountain"
+popup/item_1/id = 1
+popup/item_2/text = "Desert"
+popup/item_2/id = 2
+
+[node name="Fortification" type="VBoxContainer" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer/Fortification"]
+layout_mode = 2
+text = "Fortification"
+label_settings = ExtResource("5_qjskx")
+
+[node name="FortificationBox" type="SpinBox" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer/Fortification"]
+layout_mode = 2
+
+[node name="Done" type="Button" parent="CanvasLayer/UI/TerritorySetup/VBoxContainer"]
+layout_mode = 2
+text = "Done"
+
+[node name="TerritoryEditor" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryEditor"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+text = "Territory Editor"
+horizontal_alignment = 1
+
+[node name="Terrain" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Terrain"]
+layout_mode = 2
+text = "Terrain"
+label_settings = ExtResource("5_qjskx")
+
+[node name="TerrainSelector" type="OptionButton" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Terrain"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Flatland"
+popup/item_1/text = "Mountain"
+popup/item_1/id = 1
+popup/item_2/text = "Desert"
+popup/item_2/id = 2
+
+[node name="Fortification" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Fortification"]
+layout_mode = 2
+text = "Fortification"
+label_settings = ExtResource("5_qjskx")
+
+[node name="FortificationBox" type="SpinBox" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Fortification"]
+layout_mode = 2
+
+[node name="Player" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Player"]
+layout_mode = 2
+text = "Owner"
+label_settings = ExtResource("5_qjskx")
+
+[node name="PlayerSelector" type="OptionButton" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/Player"]
+layout_mode = 2
+
+[node name="HomeBase" type="CheckButton" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+text = "Home Base"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer"]
+layout_mode = 2
+
+[node name="EditPlayers" type="Button" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Edit Players"
+
+[node name="Apply" type="Button" parent="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="TerritoryInspector" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
+layout_mode = 2
+text = "Territory Inspector"
+horizontal_alignment = 1
+
+[node name="Terrain" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Terrain"]
+layout_mode = 2
+text = "Terrain"
+label_settings = ExtResource("5_qjskx")
+
+[node name="Data" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Terrain"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Player" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Player"]
+layout_mode = 2
+text = "Owned By"
+label_settings = ExtResource("5_qjskx")
+
+[node name="Data" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Player"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="HomeBase" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/HomeBase"]
+layout_mode = 2
+text = "Home Base"
+label_settings = ExtResource("5_qjskx")
+
+[node name="Data" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/HomeBase"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="CreatePlayerDialog" type="Window" parent="CanvasLayer/UI"]
+title = "Create Player"
+initial_position = 1
+size = Vector2i(180, 100)
+visible = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerName" type="LineEdit" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Player Name"
+
+[node name="PlayerColor" type="ColorPickerButton" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
+layout_mode = 2
+text = "Player Color"
+color = Color(1, 1, 1, 1)
+edit_alpha = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Cancel" type="Button" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="Create" type="Button" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Create"
+
+[node name="ActionPanel" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -223.5
+offset_top = -338.5
+offset_right = 223.5
+offset_bottom = 338.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+text = "Queue Actions"
+label_settings = ExtResource("6_121gu")
+horizontal_alignment = 1
+
+[node name="Player" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Player"]
+layout_mode = 2
+text = "Player"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="PlayerSelector" type="OptionButton" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Player"]
+layout_mode = 2
+
+[node name="Messages" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Messages"]
+layout_mode = 2
+text = "Send Message"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Messages"]
+layout_mode = 2
+
+[node name="Anonymous" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Messages/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("7_5h6mx")
+text = "Anonymous"
+
+[node name="Signed" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Messages/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("7_5h6mx")
+text = "Signed"
+
+[node name="AttackDefend" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend"]
+layout_mode = 2
+text = "Attack/Defend"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="Attack" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend"]
+layout_mode = 2
+
+[node name="AttackTerritory" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend/Attack"]
+layout_mode = 2
+button_group = ExtResource("8_riwiv")
+text = "Attack Territory"
+
+[node name="AttackUnit" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend/Attack"]
+layout_mode = 2
+button_group = ExtResource("8_riwiv")
+text = "Attack Unit"
+
+[node name="Defend" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend"]
+layout_mode = 2
+
+[node name="Fortify" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend/Defend"]
+layout_mode = 2
+button_group = ExtResource("8_riwiv")
+text = "Fortify"
+
+[node name="DefendTerritory" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend/Defend"]
+layout_mode = 2
+button_group = ExtResource("8_riwiv")
+text = "Defend Territory"
+
+[node name="DefendUnit" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/AttackDefend/Defend"]
+layout_mode = 2
+button_group = ExtResource("8_riwiv")
+text = "Defend Unit"
+
+[node name="Recruitment" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Recruitment"]
+layout_mode = 2
+text = "Recruitment"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Recruitment"]
+layout_mode = 2
+
+[node name="Recruit" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Recruitment/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("9_b5xpo")
+text = "Recruit Unit"
+
+[node name="MoveRegroup" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/MoveRegroup"]
+layout_mode = 2
+text = "Movement"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/MoveRegroup"]
+layout_mode = 2
+
+[node name="Move" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/MoveRegroup/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("10_113jk")
+text = "Move Troop"
+
+[node name="Regroup" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/MoveRegroup/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("10_113jk")
+text = "Regroup Troop"
+
+[node name="Stationing" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Stationing"]
+layout_mode = 2
+text = "Stationing"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Stationing"]
+layout_mode = 2
+
+[node name="Station" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Stationing/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("11_tn6sn")
+text = "Station"
+
+[node name="Unstation" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Stationing/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("11_tn6sn")
+text = "Unstation"
+
+[node name="Banding" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Banding"]
+layout_mode = 2
+text = "Banding"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Banding"]
+layout_mode = 2
+
+[node name="Band" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Banding/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("12_fcb3n")
+text = "Band Units"
+
+[node name="Spying" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Spying"]
+layout_mode = 2
+text = "Spying"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Spying"]
+layout_mode = 2
+
+[node name="Assess" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Spying/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("13_q8msi")
+text = "Assess Territory"
+
+[node name="Uncover" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Spying/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("13_q8msi")
+text = "Uncover Spy"
+
+[node name="Treaties" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties"]
+layout_mode = 2
+text = "Treaties"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties"]
+layout_mode = 2
+
+[node name="Sign" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("14_6trwr")
+text = "Sign Treaty"
+
+[node name="Break" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("14_6trwr")
+text = "Break Treaty"
+
+[node name="ResourceRequests" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests"]
+layout_mode = 2
+text = "Resource Requests"
+label_settings = ExtResource("6_ksvmw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests"]
+layout_mode = 2
+
+[node name="Request" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer"]
+layout_mode = 2
+text = "Request Resources"
+
+[node name="Deny" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer"]
+layout_mode = 2
+text = "Deny Requst"
+
+[node name="Fulfill" type="CheckBox" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer"]
+layout_mode = 2
+text = "Fulfill Request"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="Continue" type="Button" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continue"
+
+[node name="ActionInfo" type="Window" parent="CanvasLayer/UI"]
+title = "Action Info"
+position = Vector2i(0, 36)
+size = Vector2i(250, 300)
+visible = false
+min_size = Vector2i(250, 300)
+script = ExtResource("16_x4mbb")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Placeholder"
+label_settings = ExtResource("6_121gu")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Player" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Player"]
+layout_mode = 2
+text = "Player"
+label_settings = ExtResource("5_qjskx")
+
+[node name="PlayerSelector" type="OptionButton" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Player"]
+layout_mode = 2
+
+[node name="Territory" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory"]
+layout_mode = 2
+text = "Selected Territory"
+label_settings = ExtResource("5_qjskx")
+
+[node name="Territory1" type="HBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory"]
+layout_mode = 2
+
+[node name="SelectedTerritory" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory1"]
+layout_mode = 2
+text = "Selected territory placeholder"
+
+[node name="Enable" type="CheckBox" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory1"]
+visible = false
+layout_mode = 2
+button_pressed = true
+button_group = ExtResource("16_bwqyw")
+
+[node name="Territory2" type="HBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory"]
+layout_mode = 2
+
+[node name="SelectedTerritory" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory2"]
+layout_mode = 2
+text = "Other territory placeholder"
+
+[node name="Enable" type="CheckBox" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory2"]
+visible = false
+layout_mode = 2
+button_group = ExtResource("16_bwqyw")
+
+[node name="FriendlyUnit" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/FriendlyUnit"]
+layout_mode = 2
+text = "Friendly Unit"
+label_settings = ExtResource("5_qjskx")
+
+[node name="FriendlyUnitSelector" type="OptionButton" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/FriendlyUnit"]
+layout_mode = 2
+
+[node name="EnemyUnit" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/EnemyUnit"]
+layout_mode = 2
+text = "Enemy Unit"
+label_settings = ExtResource("5_qjskx")
+
+[node name="EnemyUnitSelector" type="OptionButton" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/EnemyUnit"]
+layout_mode = 2
+
+[node name="UnitType" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/UnitType"]
+layout_mode = 2
+text = "Unit Type"
+label_settings = ExtResource("5_qjskx")
+
+[node name="UnitTypeSelector" type="OptionButton" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/UnitType"]
+layout_mode = 2
+selected = 0
+item_count = 8
+popup/item_0/text = "Standard Troop"
+popup/item_1/text = "Heavy Troop"
+popup/item_1/id = 1
+popup/item_2/text = "Scout"
+popup/item_2/id = 2
+popup/item_3/text = "Defender"
+popup/item_3/id = 3
+popup/item_4/text = "Siegemaster"
+popup/item_4/id = 4
+popup/item_5/text = "Dunewalker"
+popup/item_5/id = 5
+popup/item_6/text = "Highlander"
+popup/item_6/id = 6
+popup/item_7/text = "Spy"
+popup/item_7/id = 7
+
+[node name="Name" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Name"]
+layout_mode = 2
+text = "Name"
+label_settings = ExtResource("5_qjskx")
+
+[node name="NameText" type="LineEdit" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Name"]
+layout_mode = 2
+
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Message goes here"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+layout_mode = 2
+
+[node name="Continue" type="Button" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continue"
+
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/MainLoad/MainLoadContainer/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/MainLoad/MainLoadContainer/LoadGame" to="." method="_on_load_game_pressed"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/LoadPretty" to="." method="_on_load_pretty_pressed"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/LoadIndex" to="." method="_on_load_index_pressed"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/HBoxContainer/Back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/HBoxContainer/Continue" to="." method="_on_continue_pressed"]
+[connection signal="file_selected" from="CanvasLayer/SaveLoadUI/LoadDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="pressed" from="CanvasLayer/SaveLoadUI/Save/Save" to="." method="_on_save_pressed"]
+[connection signal="file_selected" from="CanvasLayer/SaveLoadUI/SaveDialog" to="." method="_on_save_dialog_file_selected"]
+[connection signal="file_selected" from="CanvasLayer/SaveLoadUI/LoadStateDialog" to="." method="_on_load_state_dialog_file_selected"]
+[connection signal="pressed" from="CanvasLayer/UI/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="toggled" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase" to="." method="_on_home_base_toggled"]
+[connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/EditPlayers" to="." method="_on_edit_players_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/Apply" to="." method="_on_apply_pressed"]
+[connection signal="close_requested" from="CanvasLayer/UI/CreatePlayerDialog" to="." method="_on_create_player_dialog_close_requested"]
+[connection signal="pressed" from="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_cancel_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer/Create" to="." method="_on_create_pressed"]
+[connection signal="item_selected" from="CanvasLayer/UI/ActionPanel/VBoxContainer/Player/PlayerSelector" to="." method="_on_player_selector_action_item_selected"]
+[connection signal="pressed" from="CanvasLayer/UI/ActionPanel/VBoxContainer/HBoxContainer/Continue" to="." method="_on_continue_action_pressed"]
