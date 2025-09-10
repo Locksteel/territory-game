@@ -10,6 +10,7 @@ class_name Player
 # Dictionary with the format [Territory ID: int] = Fortification: int
 @export var territory_data: Dictionary = {}
 
+@export var allies: Array[Player] = []
 
 @export var actions: Dictionary = {}
 
@@ -34,6 +35,20 @@ func _init() -> void:
 	self.actions["request"] = false
 	self.actions["deny"] = false
 	self.actions["fulfill"] = false
+
+func sign_treaty(ally: Player) -> void:
+	self.allies.append(ally)
+	ally.allies.append(self)
+
+func break_treaty(player: Player) -> bool:
+	if not (player in self.allies and self in player.allies):
+		print("Invalid treaty break")
+		return false
+	
+	self.allies.erase(player)
+	player.allies.erase(self)
+	
+	return true
 
 # Sends a message to a specified player, returns the array sent to that player
 func send_message(destination: Player, message: String, anonymous: bool) -> Array[String]:

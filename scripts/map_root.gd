@@ -1558,6 +1558,42 @@ func turn() -> int:
 								REMINDER_TEXT.show_message("Please select a territory before continuing")
 				"sign":
 					pass
+					#var target: Player
+					#var enemy_players: Array[Player]
+					#
+					#for enemy in $TerritoryManager.players:
+						#if enemy != $TerritoryManager.players[0] and enemy != player:
+							#enemy_players.append(enemy)
+#
+					#action_info_label.text = "%s: Uncover a Territory" % player.name
+					#boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
+#
+					## Show UI
+					#boxes["Territory"].show()
+					#action_info.show()
+#
+					#while true:
+						#var outcome = await wait_for_continue_or_selection(continue_b)
+#
+						#if outcome.type == "territory":
+							#var terr: Territory = outcome.territory
+							#
+							#if terr.owner not in enemy_players:
+								#REMINDER_TEXT.show_message("You must select an enemy territory")
+								#continue
+#
+							#target = terr.owner
+							#boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(terr.id)
+#
+						#elif outcome.type == "continue":
+							#if target:
+								#call = Callable(player, "sign_treaty").bind(target)
+								#priority = CallPriority.HIGH
+								#
+								#print("Player %s signs treaty with %s" % [player.name, target.name])
+								#break
+							#else:
+								#REMINDER_TEXT.show_message("Please select a territory before continuing")
 				"break":
 					pass
 				"request":
