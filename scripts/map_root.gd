@@ -1525,7 +1525,37 @@ func turn() -> int:
 							print("Unit '%s', owned by %s, assesses territory %s" % [target.name, player.name, territory.id])
 							break
 				"uncover":
-					pass
+					var target: Territory
+
+					action_info_label.text = "%s: Uncover a Territory" % player.name
+					boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
+
+					# Show UI
+					boxes["Territory"].show()
+					action_info.show()
+
+					while true:
+						var outcome = await wait_for_continue_or_selection(continue_b)
+
+						if outcome.type == "territory":
+							var terr: Territory = outcome.territory
+							
+							if terr.owner != player:
+								REMINDER_TEXT.show_message("You can only uncover your own territories")
+								continue
+
+							target = terr
+							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(target.id)
+
+						elif outcome.type == "continue":
+							if target:
+								call = Callable($TerritoryManager, "uncover").bind(target)
+								priority = CallPriority.NORM
+								
+								print("Territory %s, owned by %s, uncovers" % [target.id, target.owner.name])
+								break
+							else:
+								REMINDER_TEXT.show_message("Please select a territory before continuing")
 				"sign":
 					pass
 				"break":

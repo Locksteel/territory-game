@@ -109,6 +109,21 @@ func band_troops(troops: Array[Unit], band_name: String) -> Band:
 	
 	return band
 
+# Check if enemy spy is on territory
+# If spy present, kill it
+# Returns number of spies killed
+func uncover(territory: Territory) -> int:
+	var killed: int = 0
+	for unit in units:
+		if (unit.current_territory == territory and
+			unit is Spy and
+			unit not in territory.owner.units_owned
+		):
+			kill_troop(unit)
+			killed += 1
+	
+	return killed
+
 func unique_name(name: String) -> bool:
 	for unit in units:
 		if unit.name == name:
