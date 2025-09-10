@@ -454,6 +454,7 @@ func update_player_selector(selector: OptionButton, skip_none: bool = false):
 # Otherwise if territory is passed, show all units on that territory
 # Otherwise update with all units
 # If show_owner is true, append owner to front of unit (ignored if player is null)
+# Shows only units that fulfill passed condition
 func update_unit_selector(
 	selector: OptionButton,
 	player: Player = null,
@@ -1449,7 +1450,80 @@ func turn() -> int:
 							print("Units '%s' and '%s' owned by %s, band into '%s'" % [unit1.name, unit2.name, player.name, name])
 							break
 				"assess":
-					pass
+					var target: Spy
+					var territory: Territory
+
+					# Check if player has any spies on unowned territories
+					var has_spies: bool = false
+					for unit in player.units_owned:
+						if unit is Spy and unit.current_territory.owner != player:
+							has_spies = true
+							break
+					if not has_spies:
+						REMINDER_TEXT.show_message("You don't have any spies on unowned territories")
+						continue
+
+					action_info_label.text = "%s: Assess a Territory" % player.name
+					boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
+					boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").hide()
+
+					# Show UI
+					boxes["FriendlyUnit"].show()
+					boxes["Territory"].show()
+					action_info.show()
+
+					while true:
+						var outcome = await wait_for_continue_or_selection(continue_b)
+
+						if outcome.type == "territory":
+							var terr: Territory = outcome.territory
+							
+							# Check if player owns selected territory
+							if terr.owner == player:
+								REMINDER_TEXT.show_message("You cannot assess your own territories")
+								continue
+							
+							# Check if player owns spies there
+							var has_spies_here := false
+							for unit: Unit in player.units_owned:
+								if (unit.current_territory == terr and unit is Spy):
+									has_spies_here = true
+									break
+							if not has_spies_here:
+								REMINDER_TEXT.show_message("You don't own any spies there")
+								continue
+							
+							territory = terr
+
+							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(territory.id)
+
+							# Populate unit selectors
+							update_unit_selector(boxes["FriendlyUnit"].get_node("FriendlyUnitSelector"), player, territory, true,
+								func(unit: Unit): return not unit.stationed and unit is Spy)
+
+							boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").show()
+
+						elif outcome.type == "continue":
+							if not territory:
+								REMINDER_TEXT.show_message("Select a territory first")
+								continue
+
+							
+							var target_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
+							var target_temp: Unit = $TerritoryManager.get_unit_by_id(target_id)
+
+							if not (target_temp and target_temp is Spy):
+								REMINDER_TEXT.show_message("Select a friendly spy before continuing")
+								continue
+
+							# Assign permanent var
+							target = target_temp
+
+							call = Callable(player, "gain_intel").bind(territory)
+							priority = CallPriority.NORM
+							
+							print("Unit '%s', owned by %s, assesses territory %s" % [target.name, player.name, territory.id])
+							break
 				"uncover":
 					pass
 				"sign":

@@ -5,8 +5,11 @@ class_name Player
 @export var name: String = ""
 @export var resources: int = 0
 @export var units_owned: Array[Unit] = []
-# Array of tuples with the format [Sender, Message] (Sender == "Anonymous" if anonymous)
+# Array of tuples of strings with the format [Sender, Message] (Sender == "Anonymous" if anonymous)
 @export var messages: Array[Array]
+# Dictionary with the format [Territory ID: int] = Fortification: int
+@export var territory_data: Dictionary = {}
+
 
 @export var actions: Dictionary = {}
 
@@ -49,3 +52,16 @@ func dismiss_message(index: int = 0) -> void:
 
 func dismiss_all_messages() -> void:
 	self.messages.clear()
+
+# Gain fortification info on territory
+# Return fortification of territory
+func gain_intel(territory: Territory) -> int:
+	var fortification: int = territory.fortification
+	self.territory_data[territory.id] = fortification
+	return fortification
+
+func dismiss_intel(territory: Territory) -> void:
+	self.territory_data.erase(territory.id)
+
+func dismiss_all_intel() -> void:
+	self.territory_data.clear()
