@@ -104,7 +104,8 @@ func _on_continue_pressed() -> void:
 	maps_ready = true
 	$CanvasLayer/SaveLoadUI/LoadNew.hide()
 	
-	set_territory_info()
+	#set_territory_info()
+	set_player_info()
 	
 	$CanvasLayer/SaveLoadUI/Save.show()
 	$CanvasLayer/UI.show()
@@ -297,6 +298,31 @@ func set_territory_info() -> void:
 	current_state = prev_state
 	territory_setting = null
 	$CanvasLayer/UI/TerritorySetup.hide()
+
+func _on_create_player_pressed() -> void:
+	var dialog := $CanvasLayer/UI/CreatePlayerDialog
+	dialog.popup_centered()
+
+func update_player_count_txt():
+	var player_count_text = "Player Count: " + str($TerritoryManager.players.size() - 1)
+	$CanvasLayer/UI/PlayerSetup/VBoxContainer/Count.text = player_count_text
+
+func set_player_info() -> void:
+	var setup := $CanvasLayer/UI/PlayerSetup
+	var unit_cont := $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units
+	var continute_b: Button = $CanvasLayer/UI/PlayerSetup/VBoxContainer/Continue
+	var dialog := $CanvasLayer/UI/CreatePlayerDialog
+	
+	update_player_count_txt()
+	
+	setup.show()
+	unit_cont.show()
+	
+	await continute_b.pressed
+	
+	dialog.hide()
+	unit_cont.hide()
+	setup.hide()
 
 func _on_home_base_toggled(toggled_on: bool) -> void:
 	if toggled_on and not selected_territories[0].home_base:
@@ -516,13 +542,22 @@ func _on_edit_players_pressed() -> void:
 
 func _on_create_pressed() -> void:
 	if $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerName.text == "" or $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerColor.color == Color.WHITE:
+		REMINDER_TEXT.show_message("Name or color invalid, player not created")
+		$CanvasLayer/UI/CreatePlayerDialog.hide()
 		return
 	
 	var new_player = Player.new()
 	new_player.name = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerName.text
 	new_player.color = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerColor.color
 	
+	var units_created = 0
+	for i in $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units/Count.value:
+		# TO-DO: Create unit dialog window
+		print("Creating unit %s" % i)
+	
 	$TerritoryManager.add_player(new_player)
+	
+	update_player_count_txt()
 	
 	update_player_selector($CanvasLayer/UI/TerritoryEditor/VBoxContainer/Player/PlayerSelector)
 	$CanvasLayer/UI/CreatePlayerDialog.hide()
