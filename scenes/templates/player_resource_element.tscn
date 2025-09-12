@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://6okl52xwnlor"]
+
+[ext_resource type="Script" path="res://scenes/templates/player_resource_element.gd" id="1_pqckf"]
+
+[node name="PlayerResourceElement" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_pqckf")
+
+[node name="CheckButton" type="CheckButton" parent="."]
+layout_mode = 2
+text = "PLAYER NAME HERE"
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 2
+placeholder_text = "Signature"
+
+[node name="SpinBox" type="SpinBox" parent="."]
+layout_mode = 2

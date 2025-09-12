@@ -7,6 +7,9 @@ class_name Player
 @export var units_owned: Array[Unit] = []
 # Array of tuples of strings with the format [Sender, Message] (Sender == "Anonymous" if anonymous)
 @export var messages: Array[Array]
+
+@export var pending_requests: Array[ResourceRequest]
+@export var fulfilled_requests: Array[ResourceRequest]
 # Dictionary with the format [Territory ID: int] = Fortification: int
 @export var territory_data: Dictionary = {}
 
@@ -67,6 +70,45 @@ func dismiss_message(index: int = 0) -> void:
 
 func dismiss_all_messages() -> void:
 	self.messages.clear()
+
+# Resource requests
+func request_resources(player: Player, signature: String, amount: int) -> ResourceRequest:
+	var request := ResourceRequest.new(self, signature, amount)
+	player.pending_requests.append(request)
+	return request
+
+func can_fulfill(request: ResourceRequest) -> bool:
+	if request not in self.pending_requests:
+		print("Passed request not found in %s's pending requests" % self.name)
+		return false
+	
+	return self.resources >= request.amount
+
+func deny_request(request: ResourceRequest) -> ResourceRequest:
+	if request not in self.pending_requests:
+		print("Passed request not found in %s's pending requests" % self.name)
+		return request
+	
+	self.pending_requests.erase(request)
+	request.deny()
+	
+	return request
+
+func fulfill_request(request: ResourceRequest) -> ResourceRequest:
+	if request not in self.pending_requests:
+		print("Passed request not found in %s's pending requests" % self.name)
+		return request
+	if not self.can_fulfill(request):
+		print("Player %s has insufficient funds to fulfill passed request" % self.name)
+		return request
+	
+	self.resources -= request.amount
+	request.fulfill()
+	
+	self.pending_requests.erase(request)
+	self.fulfilled_requests.append(request)
+	
+	return request
 
 # Gain fortification info on territory
 # Return fortification of territory

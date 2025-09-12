@@ -55,6 +55,13 @@ func get_unit_by_id(id: int) -> Unit:
 func add_player(player: Player):
 	players.append(player)
 
+func get_player_by_name(name: String) -> Player:
+	for player in players:
+		if player.name == name:
+			return player
+	
+	return null
+
 func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, name: String) -> Unit:
 	if owner not in players:
 		print("Passed player is not in player list")

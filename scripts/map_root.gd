@@ -23,6 +23,9 @@ enum CallPriority { LOW, NORM, HIGH }
 
 @onready var REMINDER_TEXT: Label = $CanvasLayer/UI/ReminderText
 
+# Scene templates
+var player_resource_element = preload("res://scenes/templates/player_resource_element.tscn")
+
 #var last_selected_id: int = -1
 
 #var selected_territory: Territory
@@ -678,7 +681,7 @@ func turn() -> int:
 			var entry: bool = player.actions[key]
 			
 			# Function call to append to action queue
-			var call: Callable
+			var calls: Array[Callable]
 			# Whether function call is priority (defensive)
 			var priority: CallPriority
 			
@@ -719,7 +722,7 @@ func turn() -> int:
 					
 					# Send Message
 					#player.send_message(destination, message, anonymous)
-					call = Callable(player, "send_message").bind(destination, message, anonymous)
+					calls.append(Callable(player, "send_message").bind(destination, message, anonymous))
 					priority = CallPriority.NORM
 					
 					print("Sent message from %s to %s:\n%s\nFrom: %s" %
@@ -779,7 +782,7 @@ func turn() -> int:
 
 								if attacker:
 									#attacker.attack_territory(target)
-									call = Callable(attacker, "attack_territory").bind(target)
+									calls.append(Callable(attacker, "attack_territory").bind(target))
 									priority = CallPriority.NORM
 									
 									print("Unit '%s' attacks territory %s owned by %s" % [attacker.name, target.id, target.owner.name])
@@ -869,7 +872,7 @@ func turn() -> int:
 
 							if attacker and target and enemy_owner:
 								#attacker.attack_unit(target)
-								call = Callable(attacker, "attack_unit").bind(target)
+								calls.append(Callable(attacker, "attack_unit").bind(target))
 								priority = CallPriority.NORM
 								
 								print("Unit '%s' attacks unit '%s' owned by %s" % [attacker.name, target.name, enemy_owner.name])
@@ -903,7 +906,7 @@ func turn() -> int:
 							elif outcome.type == "continue":
 								if territory:
 									#territory.fortify()
-									call = Callable(territory, "fortify")
+									calls.append(Callable(territory, "fortify"))
 									priority = CallPriority.HIGH
 									
 									print("Territory %s fortified" % territory.id)
@@ -936,7 +939,7 @@ func turn() -> int:
 						elif outcome.type == "continue":
 							if target:
 								#target.defend()
-								call = Callable(target, "defend")
+								calls.append(Callable(target, "defend"))
 								priority = CallPriority.HIGH
 								
 								print("Territory %s, owned by %s, defends" % [target.id, target.owner.name])
@@ -1003,7 +1006,7 @@ func turn() -> int:
 
 							if target:
 								#attacker.attack_unit(target)
-								call = Callable(target, "defend")
+								calls.append(Callable(target, "defend"))
 								priority = CallPriority.HIGH
 								
 								print("Unit '%s', owned by %s, defends" % [target.name, player.name])
@@ -1054,7 +1057,7 @@ func turn() -> int:
 							
 							
 							if unit_type and territory and name:
-								call = Callable($TerritoryManager, "recruit_troop").bind(player, unit_type, territory, name)
+								calls.append(Callable($TerritoryManager, "recruit_troop").bind(player, unit_type, territory, name))
 								priority = CallPriority.NORM
 								
 								print("Unit '%s' of type %s is recruited by %s" % [name, Unit.TYPE_DICT[unit_type], player.name])
@@ -1143,7 +1146,7 @@ func turn() -> int:
 							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if true: #target:
-								call = Callable(target, "move").bind(destination)
+								calls.append(Callable(target, "move").bind(destination))
 								priority = CallPriority.LOW
 								
 								print("Unit '%s', owned by %s, moves from territory %s to %s" % [target.name, player.name, source.id, destination.id])
@@ -1214,7 +1217,7 @@ func turn() -> int:
 
 							if target:
 								#attacker.attack_unit(target)
-								call = Callable(target, "regroup")
+								calls.append(Callable(target, "regroup"))
 								priority = CallPriority.LOW
 								
 								print("Unit '%s', owned by %s, regroups" % [target.name, player.name])
@@ -1286,7 +1289,7 @@ func turn() -> int:
 							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
-								call = Callable(target, "station").bind(territory)
+								calls.append(Callable(target, "station").bind(territory))
 								priority = CallPriority.HIGH
 								
 								print("Unit '%s', owned by %s, defends" % [target.name, player.name])
@@ -1358,7 +1361,7 @@ func turn() -> int:
 							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
 
 							if target:
-								call = Callable(target, "unstation").bind(territory)
+								calls.append(Callable(target, "unstation").bind(territory))
 								priority = CallPriority.HIGH
 								
 								print("Unit '%s' on territory %s, owned by %s, unstations" %
@@ -1444,7 +1447,7 @@ func turn() -> int:
 							unit2 = unit2_temp
 							
 							
-							call = Callable($TerritoryManager, "band_troops").bind([unit1, unit2], name)
+							calls.append(Callable($TerritoryManager, "band_troops").bind([unit1, unit2], name))
 							priority = CallPriority.LOW
 							
 							print("Units '%s' and '%s' owned by %s, band into '%s'" % [unit1.name, unit2.name, player.name, name])
@@ -1519,7 +1522,7 @@ func turn() -> int:
 							# Assign permanent var
 							target = target_temp
 
-							call = Callable(player, "gain_intel").bind(territory)
+							calls.append(Callable(player, "gain_intel").bind(territory))
 							priority = CallPriority.NORM
 							
 							print("Unit '%s', owned by %s, assesses territory %s" % [target.name, player.name, territory.id])
@@ -1549,7 +1552,7 @@ func turn() -> int:
 
 						elif outcome.type == "continue":
 							if target:
-								call = Callable($TerritoryManager, "uncover").bind(target)
+								calls.append(Callable($TerritoryManager, "uncover").bind(target))
 								priority = CallPriority.NORM
 								
 								print("Territory %s, owned by %s, uncovers" % [target.id, target.owner.name])
@@ -1587,7 +1590,7 @@ func turn() -> int:
 #
 						#elif outcome.type == "continue":
 							#if target:
-								#call = Callable(player, "sign_treaty").bind(target)
+								#calls.append(Callable(player, "sign_treaty").bind(target))
 								#priority = CallPriority.HIGH
 								#
 								#print("Player %s signs treaty with %s" % [player.name, target.name])
@@ -1597,24 +1600,77 @@ func turn() -> int:
 				"break":
 					pass
 				"request":
-					pass
+					var requests: Dictionary = {}
+					var parent = $CanvasLayer/UI/ActionInfo/VBoxContainer/ResourceRequest
+					
+					# Create elements
+					var elements = create_resource_elements(parent, player)
+					
+					boxes["ResourceRequest"].show()
+					
+					await continue_b.pressed
+					
+					for element: PlayerResourceElement in elements:
+						if element.get_node("CheckButton").button_pressed:
+							var name = element.get_node("CheckButton").text
+							var target = $TerritoryManager.get_player_by_name(name)
+							var signature = element.get_node("LineEdit").text
+							var amount = element.get_node("SpinBox").value
+							
+							var call := Callable(player, "request_resources").bind(target, signature, amount)
+							calls.append(call)
+					
+					priority = CallPriority.NORM
+					
 				"deny":
 					pass
 				"fulfill":
 					pass
 			$CanvasLayer/UI/ActionInfo.hide()
+
+			if calls is Array[Callable]:
+				if priority == CallPriority.LOW:
+					$TerritoryManager.last_action_queue += calls
+				elif priority == CallPriority.NORM:
+					$TerritoryManager.action_queue += calls
+				elif priority == CallPriority.HIGH:
+					$TerritoryManager.priority_action_queue += calls
+			else:
+				print("Invalid calls to append")
 			
-			if priority == CallPriority.LOW:
-				$TerritoryManager.last_action_queue.append(call)
-			elif priority == CallPriority.NORM:
-				$TerritoryManager.action_queue.append(call)
-			elif priority == CallPriority.HIGH:
-				$TerritoryManager.priority_action_queue.append(call)
+			calls.clear()
 	
 	run_actions()
 	
 	$TerritoryManager.turn += 1
 	return $TerritoryManager.turn
+
+# Create a resource element for each player as children of passed node
+# Returns an array of instantiated elements
+func create_resource_elements(parent: Node, caller: Player) -> Array[PlayerResourceElement]:
+	var elements: Array[PlayerResourceElement] = []
+	
+	# Clear old selectors
+	for child: Node in parent.get_children():
+		if child is PlayerResourceElement:
+			child.queue_free()
+	
+	for player in $TerritoryManager.players:
+		if player != caller and player != $TerritoryManager.players[0]:
+			var element = player_resource_element.instantiate()
+			parent.add_child(element)
+			
+			var button = element.get_node("CheckButton")
+			var lineedit = element.get_node("LineEdit")
+			var spinbox = element.get_node("SpinBox")
+			
+			button.text = player.name
+			lineedit.text = caller.name
+			spinbox.value = 0
+			
+			elements.append(element)
+	
+	return elements
 
 func run_actions():
 	for action: Callable in $TerritoryManager.priority_action_queue:
@@ -1628,6 +1684,7 @@ func run_actions():
 	
 	$TerritoryManager.priority_action_queue.clear()
 	$TerritoryManager.action_queue.clear()
+	$TerritoryManager.last_action_queue.clear()
 
 func update_map():
 	pass # TO-DO: Upade visuals of map based on new game state

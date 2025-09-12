@@ -594,6 +594,7 @@ button_group = ExtResource("13_q8msi")
 text = "Uncover Spy"
 
 [node name="Treaties" type="VBoxContainer" parent="CanvasLayer/UI/ActionPanel/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties"]
@@ -685,6 +686,15 @@ label_settings = ExtResource("5_qjskx")
 [node name="PlayerSelector" type="OptionButton" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Player"]
 layout_mode = 2
 
+[node name="ResourceRequest" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/ResourceRequest"]
+layout_mode = 2
+text = "Players"
+label_settings = ExtResource("5_qjskx")
+
 [node name="Territory" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
 visible = false
 layout_mode = 2
@@ -756,6 +766,7 @@ label_settings = ExtResource("5_qjskx")
 layout_mode = 2
 
 [node name="UnitType" type="VBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/UnitType"]
