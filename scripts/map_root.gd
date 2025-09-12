@@ -318,7 +318,13 @@ func set_player_info() -> void:
 	setup.show()
 	unit_cont.show()
 	
-	await continute_b.pressed
+	while true:
+		await continute_b.pressed
+		
+		if $TerritoryManager.players.size() > 2:
+			break
+		
+		REMINDER_TEXT.show_message("You need at least 2 players to play")
 	
 	dialog.hide()
 	unit_cont.hide()
