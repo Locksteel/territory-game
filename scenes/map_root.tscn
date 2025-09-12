@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://dsb3sliyetmax"]
+[gd_scene load_steps=20 format=3 uid="uid://dsb3sliyetmax"]
 
 [ext_resource type="Script" path="res://scripts/map_root.gd" id="1_hsy55"]
 [ext_resource type="Script" path="res://scripts/territory_manager.gd" id="2_khk40"]
@@ -7,6 +7,7 @@
 [ext_resource type="LabelSettings" uid="uid://bsqfnka11aswk" path="res://fonts/small_label_text.tres" id="5_qjskx"]
 [ext_resource type="LabelSettings" uid="uid://cacfsntwvi28w" path="res://fonts/title_label_text.tres" id="6_121gu"]
 [ext_resource type="LabelSettings" uid="uid://c86fx3uqa5deo" path="res://fonts/medium_label_text.tres" id="6_ksvmw"]
+[ext_resource type="Script" path="res://scripts/create_player_dialog.gd" id="6_nvlbe"]
 [ext_resource type="ButtonGroup" uid="uid://dg22a4t3latar" path="res://ui/messages.tres" id="7_5h6mx"]
 [ext_resource type="ButtonGroup" uid="uid://but5r0g53wdea" path="res://ui/attack_defend.tres" id="8_riwiv"]
 [ext_resource type="ButtonGroup" uid="uid://cg0s2aqhj12pp" path="res://ui/recruitment.tres" id="9_b5xpo"]
@@ -366,11 +367,42 @@ label_settings = ExtResource("5_qjskx")
 layout_mode = 2
 horizontal_alignment = 1
 
+[node name="PlayerSetup" type="PanelContainer" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -56.0
+offset_top = -33.0
+offset_right = 56.0
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/PlayerSetup"]
+layout_mode = 2
+
+[node name="CreatePlayer" type="Button" parent="CanvasLayer/UI/PlayerSetup/VBoxContainer"]
+layout_mode = 2
+text = "Create Player"
+
+[node name="Count" type="Label" parent="CanvasLayer/UI/PlayerSetup/VBoxContainer"]
+layout_mode = 2
+
+[node name="Continue" type="Button" parent="CanvasLayer/UI/PlayerSetup/VBoxContainer"]
+layout_mode = 2
+text = "Continue"
+
 [node name="CreatePlayerDialog" type="Window" parent="CanvasLayer/UI"]
 title = "Create Player"
 initial_position = 1
-size = Vector2i(180, 100)
+size = Vector2i(200, 240)
 visible = false
+min_size = Vector2i(200, 240)
+script = ExtResource("6_nvlbe")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog"]
 anchors_preset = 15
@@ -385,13 +417,24 @@ placeholder_text = "Player Name"
 
 [node name="PlayerColor" type="ColorPickerButton" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 text = "Player Color"
 color = Color(1, 1, 1, 1)
 edit_alpha = false
 
+[node name="Units" type="HBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units"]
+layout_mode = 2
+text = "Starting Units"
+
+[node name="Count" type="SpinBox" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units"]
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 3
 
 [node name="Cancel" type="Button" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -839,6 +882,8 @@ text = "Continue"
 [connection signal="toggled" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase" to="." method="_on_home_base_toggled"]
 [connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/EditPlayers" to="." method="_on_edit_players_pressed"]
 [connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/Apply" to="." method="_on_apply_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/PlayerSetup/VBoxContainer/CreatePlayer" to="." method="_on_create_player_pressed"]
+[connection signal="about_to_popup" from="CanvasLayer/UI/CreatePlayerDialog" to="CanvasLayer/UI/CreatePlayerDialog" method="_on_about_to_popup"]
 [connection signal="close_requested" from="CanvasLayer/UI/CreatePlayerDialog" to="." method="_on_create_player_dialog_close_requested"]
 [connection signal="pressed" from="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer/Cancel" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/HBoxContainer/Create" to="." method="_on_create_pressed"]
