@@ -588,8 +588,7 @@ func set_player_actions(player: Player) -> void:
 	action_dict["sign"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer/Sign.button_pressed
 	action_dict["break"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer/Break.button_pressed
 	action_dict["request"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Request.button_pressed
-	action_dict["deny"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Deny.button_pressed
-	action_dict["fulfill"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Fulfill.button_pressed
+	action_dict["respond"] = $CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Respond.button_pressed
 	
 	player.actions = action_dict
 	
@@ -1600,7 +1599,6 @@ func turn() -> int:
 				"break":
 					pass
 				"request":
-					var requests: Dictionary = {}
 					var parent = $CanvasLayer/UI/ActionInfo/VBoxContainer/ResourceRequest
 					
 					# Create elements
@@ -1621,11 +1619,27 @@ func turn() -> int:
 							calls.append(call)
 					
 					priority = CallPriority.NORM
+				"respond":
+					var parent = $CanvasLayer/UI/ActionInfo/VBoxContainer/ResourceRespond
+					var requests = player.pending_requests.duplicate()
 					
-				"deny":
-					pass
-				"fulfill":
-					pass
+					var buttons = create_respond_elements(parent, player)
+					
+					boxes["ResourcesRespond"].show()
+					
+					await continue_b.pressed
+					
+					var req_idx = 0
+					for button: CheckButton in buttons:
+						var call: Callable
+						if button.button_pressed:
+							# Fulfill request
+							call = Callable(player, "fulfill_request").bind(requests[req_idx])
+						else:
+							call = Callable(player, "deny_request").bind(requests[req_idx])
+						
+						calls.append(call)
+						req_idx += 1
 			$CanvasLayer/UI/ActionInfo.hide()
 
 			if calls is Array[Callable]:
@@ -1669,6 +1683,28 @@ func create_resource_elements(parent: Node, caller: Player) -> Array[PlayerResou
 			spinbox.value = 0
 			
 			elements.append(element)
+	
+	return elements
+
+func create_respond_elements(parent: Node, caller: Player) -> Array[CheckButton]:
+	var elements: Array[CheckButton] = []
+	
+	# Clear old buttons
+	for child: Node in parent.get_children():
+		if child is CheckButton:
+			child.queue_free()
+	
+	for request: ResourceRequest in caller.pending_requests:
+		var button := CheckButton.new()
+		button.text = request.signature
+		button.button_pressed = false
+		
+		# Disable button if cannot be fulfilled
+		if not caller.can_fulfill(request):
+			button.disabled = true
+		
+		parent.add_child(button)
+		elements.append(button)
 	
 	return elements
 
