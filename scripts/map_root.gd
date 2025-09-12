@@ -104,7 +104,7 @@ func _on_continue_pressed() -> void:
 	maps_ready = true
 	$CanvasLayer/SaveLoadUI/LoadNew.hide()
 	
-	#set_territory_info()
+	set_territory_info()
 	set_player_info()
 	
 	$CanvasLayer/SaveLoadUI/Save.show()
