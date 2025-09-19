@@ -40,11 +40,12 @@ func get_unit_owner(unit: Unit) -> Player:
 	
 	return null
 
-func get_unit_by_name(name: String, player: Player = null) -> Unit:
-	for unit in units:
-		if unit.name == name and (not player or unit in player.units_owned):
-			return unit
-	return null
+# Deprecated for id, names no longer unique for units
+#func get_unit_by_name(name: String, player: Player = null) -> Unit:
+	#for unit in units:
+		#if unit.name == name and (not player or unit in player.units_owned):
+			#return unit
+	#return null
 
 func get_unit_by_id(id: int) -> Unit:
 	for unit in units:
@@ -131,11 +132,12 @@ func uncover(territory: Territory) -> int:
 	
 	return killed
 
-func unique_name(name: String) -> bool:
-	for unit in units:
-		if unit.name == name:
-			return false
-	return true
+# Deprecated, names no longer unique to units
+#func unique_name(name: String) -> bool:
+	#for unit in units:
+		#if unit.name == name:
+			#return false
+	#return true
 
 
 func save_game_state(path: String, map_display: Image, map_index: Image) -> bool:

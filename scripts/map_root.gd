@@ -815,17 +815,16 @@ func turn() -> int:
 						elif outcome.type == "continue":
 							if target:
 								var selected_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-								var selected_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(selected_id)
 
 								# Find attacker
-								attacker = $TerritoryManager.get_unit_by_name(selected_name, player)
+								attacker = $TerritoryManager.get_unit_by_id(selected_id)
 
 								if attacker:
 									#attacker.attack_territory(target)
 									calls.append(Callable(attacker, "attack_territory").bind(target))
 									priority = CallPriority.NORM
 									
-									print("Unit '%s' attacks territory %s owned by %s" % [attacker.name, target.id, target.owner.name])
+									print("Unit '%s' attacks territory %s owned by %s" % [attacker.id, target.id, target.owner.name])
 									break
 								else:
 									REMINDER_TEXT.show_message("Please select a unit before continuing")
@@ -890,35 +889,30 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
 							var enemy_id: int = boxes["EnemyUnit"].get_node("EnemyUnitSelector").get_selected_id()
-							var enemy_name: String = boxes["EnemyUnit"].get_node("EnemyUnitSelector").get_item_text(enemy_id)
+							
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
+							var enemy: Unit = $TerritoryManager.get_unit_by_id(enemy_id)
+							var enemy_owner: Player = $TerritoryManager.get_unit_owner(enemy)
 
-							if friendly_name == "" or enemy_name == "":
+							if not (friendly and enemy):
 								REMINDER_TEXT.show_message("Select both a friendly and enemy unit before continuing")
 								continue
-
-							# Find attacker
-							attacker = $TerritoryManager.get_unit_by_name(friendly_name, player)
-
-							# Find target + owner
-							var enemy_owner: Player
-							for other_player: Player in $TerritoryManager.players:
-								for other_unit in other_player.units_owned:
-									if other_unit.name == enemy_name:
-										target = other_unit
-										enemy_owner = other_player
-										break
-
-							if attacker and target and enemy_owner:
-								#attacker.attack_unit(target)
-								calls.append(Callable(attacker, "attack_unit").bind(target))
-								priority = CallPriority.NORM
-								
-								print("Unit '%s' attacks unit '%s' owned by %s" % [attacker.name, target.name, enemy_owner.name])
-								break
-							else:
+							if not (friendly in player.units_owned and
+									enemy_owner and
+									enemy_owner != player):
 								REMINDER_TEXT.show_message("Invalid unit selection, try again")
+								continue
+
+							# Set units
+							attacker = friendly
+							target = enemy
+
+							calls.append(Callable(attacker, "attack_unit").bind(target))
+							priority = CallPriority.NORM
+							
+							print("Unit '%s' attacks unit '%s' owned by %s" % [attacker.id, target.id, enemy_owner.name])
+							break
 				"fortify":
 						var territory: Territory
 
@@ -1035,24 +1029,23 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
 
-							if friendly_name == "":
+							if not friendly:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
 								continue
-
-							# Find attacker
-							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
-
-							if target:
-								#attacker.attack_unit(target)
-								calls.append(Callable(target, "defend"))
-								priority = CallPriority.HIGH
-								
-								print("Unit '%s', owned by %s, defends" % [target.name, player.name])
-								break
-							else:
+							if friendly not in player.units_owned:
 								REMINDER_TEXT.show_message("Invalid unit selection, try again")
+								continue
+
+							# Set unit
+							target = friendly
+
+							calls.append(Callable(target, "defend"))
+							priority = CallPriority.HIGH
+							
+							print("Unit '%s', owned by %s, defends" % [target.id, player.name])
+							break
 				"recruit":
 					var territory: Territory
 
@@ -1090,10 +1083,9 @@ func turn() -> int:
 							if unit_type is not Unit.UnitType:
 								REMINDER_TEXT.show_message("Select a unit type before continuing")
 								continue
-							# Check if name entered and is unique
-							if not (name and $TerritoryManager.unique_name(name)):
-								REMINDER_TEXT.show_message("Enter a unique name")
-								continue
+							# Check if name entered, if not default to unit type name
+							if not name:
+								name = Unit.TYPE_DICT[unit_type]
 							
 							
 							if unit_type and territory and name:
@@ -1176,27 +1168,27 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
 
-							if friendly_name == "":
+							if not friendly:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
+								continue
+							if friendly not in player.units_owned:
+								REMINDER_TEXT.show_message("Invalid unit selection, please try again")
 								continue
 
 							# Find unit to move
-							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
+							target = friendly
 
-							if true: #target:
-								calls.append(Callable(target, "move").bind(destination))
-								priority = CallPriority.LOW
-								
-								print("Unit '%s', owned by %s, moves from territory %s to %s" % [target.name, player.name, source.id, destination.id])
-								
-								boxes["Territory"].get_node("Territory1/Enable").hide()
-								boxes["Territory"].get_node("Territory2/Enable").hide()
-								
-								break
-							else:
-								REMINDER_TEXT.show_message("Invalid unit selection, try again")
+							calls.append(Callable(target, "move").bind(destination))
+							priority = CallPriority.LOW
+							
+							print("Unit '%s', owned by %s, moves from territory %s to %s" % [target.id, player.name, source.id, destination.id])
+							
+							boxes["Territory"].get_node("Territory1/Enable").hide()
+							boxes["Territory"].get_node("Territory2/Enable").hide()
+							
+							break
 				"regroup":
 					var target: Unit
 					var territory: Territory
@@ -1246,24 +1238,23 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
 
-							if friendly_name == "":
+							if not friendly:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
+								continue
+							if friendly not in player.units_owned:
+								REMINDER_TEXT.show_message("Invalid unit selection, please try again")
 								continue
 
 							# Find unit
-							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
+							target = friendly
 
-							if target:
-								#attacker.attack_unit(target)
-								calls.append(Callable(target, "regroup"))
-								priority = CallPriority.LOW
-								
-								print("Unit '%s', owned by %s, regroups" % [target.name, player.name])
-								break
-							else:
-								REMINDER_TEXT.show_message("Invalid unit selection, try again")
+							calls.append(Callable(target, "regroup"))
+							priority = CallPriority.LOW
+							
+							print("Unit '%s', owned by %s, regroups" % [target.id, player.name])
+							break
 				"station":
 					var target: Unit
 					var territory: Territory
@@ -1319,23 +1310,23 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
 
-							if friendly_name == "":
+							if not friendly:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
 								continue
+							if friendly not in player.units_owned:
+								REMINDER_TEXT.show_message("Invalid unit selection, please try again")
+								continue
 
-							# Find friendly unit
-							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
+							# Set unit
+							target = friendly
 
-							if target:
-								calls.append(Callable(target, "station").bind(territory))
-								priority = CallPriority.HIGH
-								
-								print("Unit '%s', owned by %s, defends" % [target.name, player.name])
-								break
-							else:
-								REMINDER_TEXT.show_message("Invalid unit selection, try again")
+							calls.append(Callable(target, "station").bind(territory))
+							priority = CallPriority.HIGH
+							
+							print("Unit '%s', owned by %s, defends" % [target.id, player.name])
+							break
 				"unstation":
 					var target: Unit
 					var territory: Territory
