@@ -26,18 +26,8 @@ func get_unit_owner(unit: Unit) -> Player:
 func add_player(player: Player):
 	players.append(player)
 
-func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, name: String) -> Unit:
-	if owner not in players:
-		print("Passed player is not in player list")
-		return null
-	if territory not in territories:
-		print("Passed territory not territory list")
-		return null
-	for unit in units:
-		if unit.name == name:
-			print("Unit recruit failed due to non-unique name")
-			return null
-	
+
+func create_unit(type: Unit.UnitType, name: String, territory: Territory = null) -> Unit:
 	var new_unit: Unit
 	
 	match type:
@@ -58,8 +48,49 @@ func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, nam
 		Unit.UnitType.SPY:
 			new_unit = Spy.new(name, territory)
 	
-	units.append(new_unit)
 	return new_unit
+
+func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, name: String) -> Unit:
+	if owner not in players:
+		print("Passed player is not in player list")
+		return null
+	if territory not in territories:
+		print("Passed territory not territory list")
+		return null
+	
+	var new_unit: Unit = add_pending_unit(owner, type, name)
+	if not assign_unit(new_unit, territory):
+		print("Recruitment failed")
+		owner.pending_units.erase(new_unit)
+		return null
+	
+	return new_unit
+
+# Creates a unit and adds it to the pending unit list, returns the new unit
+func add_pending_unit(owner: Player, type: Unit.UnitType, name: String) -> Unit:
+	if owner not in players:
+		print("Cannot add pending unit, passed player not in player list")
+		return null
+	
+	# Create new unit with null territory (indicates pending unit)
+	var new_unit: Unit = create_unit(type, name)
+	# Append unit to passed player's pending units
+	owner.units_owned.append(new_unit)
+	
+	return new_unit
+
+func assign_unit(unit: Unit, territory: Territory) -> bool:
+	# If unit has current territory, it is not pending
+	if unit.current_territory:
+		print("Unit already assigned")
+		return false
+	
+	# Assign unit's territory to passed territory
+	unit.current_territory = territory
+	# Add unit to main unit list
+	units.append(unit)
+	
+	return true
 
 func kill_troop(troop: Unit):
 	dead_units.append(troop)
