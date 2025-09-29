@@ -27,6 +27,48 @@ func add_player(player: Player):
 	players.append(player)
 
 
+# Returns a dictionary with these parameters:
+# 	Keys = All players that own a territory in the territory list
+# 	Values = The number of territories that player owns
+func get_player_territory_counts() -> Dictionary:
+	var counts: Dictionary = {}
+	
+	if territories.is_empty():
+		return counts
+	
+	for territory: Territory in territories.values():
+		if territory.id == 0:
+			continue
+		
+		if territory.owner not in counts.keys():
+			counts[territory.owner] = 1
+		else:
+			counts[territory.owner] += 1
+	
+	return counts
+
+func get_player_home_base(player: Player) -> Territory:
+	if player not in players:
+		print("Player to get home base not in player list")
+		return null
+	
+	var base_count = 0
+	var base: Territory
+	for territory: Territory in territories.values():
+		if territory.owner == player and territory.home_base:
+			base = territory
+			base_count += 1
+	
+	if not base:
+		print("Player has no home base")
+		return null
+	if base_count > 1:
+		print("Player has multiple home bases")
+		return null
+	
+	return base
+
+
 func create_unit(type: Unit.UnitType, name: String, territory: Territory = null) -> Unit:
 	var new_unit: Unit
 	
@@ -90,6 +132,16 @@ func assign_unit(unit: Unit, territory: Territory) -> bool:
 	# Add unit to main unit list
 	units.append(unit)
 	
+	return true
+
+func assign_units_to_home() -> bool:
+	for player: Player in players:
+		var home_base: Territory = get_player_home_base(player)
+		for unit: Unit in player.units_owned:
+			if not unit.current_territory:
+				if not assign_unit(unit, home_base):
+					return false
+				print("Assigned unit '%s' to home base territory %s" % [unit.name, home_base.id])
 	return true
 
 func kill_troop(troop: Unit):
