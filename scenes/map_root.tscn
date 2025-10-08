@@ -1,13 +1,13 @@
 [gd_scene load_steps=20 format=3 uid="uid://dsb3sliyetmax"]
 
-[ext_resource type="Script" path="res://scripts/map_root.gd" id="1_hsy55"]
-[ext_resource type="Script" path="res://scripts/territory_manager.gd" id="2_khk40"]
-[ext_resource type="Script" path="res://scripts/success.gd" id="3_e0xv1"]
-[ext_resource type="Script" path="res://scripts/reminder_text.gd" id="4_0h4v6"]
+[ext_resource type="Script" uid="uid://da7yk057r24nr" path="res://scripts/map_root.gd" id="1_hsy55"]
+[ext_resource type="Script" uid="uid://bysofl70i2tas" path="res://scripts/territory_manager.gd" id="2_khk40"]
+[ext_resource type="Script" uid="uid://qd7auvbes58k" path="res://scripts/success.gd" id="3_e0xv1"]
+[ext_resource type="Script" uid="uid://cte1t8fxh5wkp" path="res://scripts/reminder_text.gd" id="4_0h4v6"]
 [ext_resource type="LabelSettings" uid="uid://bsqfnka11aswk" path="res://fonts/small_label_text.tres" id="5_qjskx"]
 [ext_resource type="LabelSettings" uid="uid://cacfsntwvi28w" path="res://fonts/title_label_text.tres" id="6_121gu"]
 [ext_resource type="LabelSettings" uid="uid://c86fx3uqa5deo" path="res://fonts/medium_label_text.tres" id="6_ksvmw"]
-[ext_resource type="Script" path="res://scripts/create_player_dialog.gd" id="6_nvlbe"]
+[ext_resource type="Script" uid="uid://dy0dodm273qh7" path="res://scripts/create_player_dialog.gd" id="6_nvlbe"]
 [ext_resource type="ButtonGroup" uid="uid://dg22a4t3latar" path="res://ui/messages.tres" id="7_5h6mx"]
 [ext_resource type="ButtonGroup" uid="uid://but5r0g53wdea" path="res://ui/attack_defend.tres" id="8_riwiv"]
 [ext_resource type="ButtonGroup" uid="uid://cg0s2aqhj12pp" path="res://ui/recruitment.tres" id="9_b5xpo"]
@@ -17,7 +17,7 @@
 [ext_resource type="ButtonGroup" uid="uid://b85epnroel4pb" path="res://ui/spying.tres" id="13_q8msi"]
 [ext_resource type="ButtonGroup" uid="uid://djhngfmxxgt52" path="res://ui/treaties.tres" id="14_6trwr"]
 [ext_resource type="ButtonGroup" uid="uid://b2f7ipqm5kq6a" path="res://ui/action_info_territory_selectors.tres" id="16_bwqyw"]
-[ext_resource type="Script" path="res://scripts/action_info.gd" id="16_x4mbb"]
+[ext_resource type="Script" uid="uid://ci7bbl0n2m8iy" path="res://scripts/action_info.gd" id="16_x4mbb"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jdyj2"]
 
@@ -223,6 +223,7 @@ layout_mode = 2
 selected = 0
 item_count = 3
 popup/item_0/text = "Flatland"
+popup/item_0/id = 0
 popup/item_1/text = "Mountain"
 popup/item_1/id = 1
 popup/item_2/text = "Desert"
@@ -270,6 +271,7 @@ layout_mode = 2
 selected = 0
 item_count = 3
 popup/item_0/text = "Flatland"
+popup/item_0/id = 0
 popup/item_1/text = "Mountain"
 popup/item_1/id = 1
 popup/item_2/text = "Desert"
@@ -799,6 +801,7 @@ layout_mode = 2
 selected = 0
 item_count = 8
 popup/item_0/text = "Standard Troop"
+popup/item_0/id = 0
 popup/item_1/text = "Heavy Troop"
 popup/item_1/id = 1
 popup/item_2/text = "Scout"
