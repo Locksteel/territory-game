@@ -63,18 +63,51 @@ func get_player_by_name(name: String) -> Player:
 	
 	return null
 
-func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, name: String) -> Unit:
-	if owner not in players:
-		print("Passed player is not in player list")
-		return null
-	if territory not in territories:
-		print("Passed territory not territory list")
-		return null
-	for unit in units:
-		if unit.name == name:
-			print("Unit recruit failed due to non-unique name")
-			return null
+# Returns a dictionary with these parameters:
+# 	Keys = All players that own a territory in the territory list
+# 	Values = The number of territories that player owns
+func get_player_territory_counts() -> Dictionary:
+	var counts: Dictionary = {}
 	
+	if territories.is_empty():
+		return counts
+	
+	for territory: Territory in territories.values():
+		if territory.id == 0:
+			continue
+		if territory.owner == players[0]:
+			continue
+		
+		if territory.owner not in counts.keys():
+			counts[territory.owner] = 1
+		else:
+			counts[territory.owner] += 1
+	
+	return counts
+
+func get_player_home_base(player: Player) -> Territory:
+	if player not in players:
+		print("Player to get home base not in player list")
+		return null
+	
+	var base_count = 0
+	var base: Territory
+	for territory: Territory in territories.values():
+		if territory.owner == player and territory.home_base:
+			base = territory
+			base_count += 1
+	
+	if not base:
+		print("Player has no home base")
+		return null
+	if base_count > 1:
+		print("Player has multiple home bases")
+		return null
+	
+	return base
+
+
+func create_unit(type: Unit.UnitType, name: String, territory: Territory = null) -> Unit:
 	var new_unit: Unit
 	
 	match type:
@@ -95,8 +128,59 @@ func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, nam
 		Unit.UnitType.SPY:
 			new_unit = Spy.new(name, territory)
 	
-	units.append(new_unit)
 	return new_unit
+
+func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, name: String) -> Unit:
+	if owner not in players:
+		print("Passed player is not in player list")
+		return null
+	if territory not in territories:
+		print("Passed territory not territory list")
+		return null
+	
+	var new_unit: Unit = add_pending_unit(owner, type, name)
+	if not assign_unit(new_unit, territory):
+		print("Recruitment failed")
+		owner.pending_units.erase(new_unit)
+		return null
+	
+	return new_unit
+
+# Creates a unit and adds it to the pending unit list, returns the new unit
+func add_pending_unit(owner: Player, type: Unit.UnitType, name: String) -> Unit:
+	if owner not in players:
+		print("Cannot add pending unit, passed player not in player list")
+		return null
+	
+	# Create new unit with null territory (indicates pending unit)
+	var new_unit: Unit = create_unit(type, name)
+	# Append unit to passed player's pending units
+	owner.units_owned.append(new_unit)
+	
+	return new_unit
+
+func assign_unit(unit: Unit, territory: Territory) -> bool:
+	# If unit has current territory, it is not pending
+	if unit.current_territory:
+		print("Unit already assigned")
+		return false
+	
+	# Assign unit's territory to passed territory
+	unit.current_territory = territory
+	# Add unit to main unit list
+	units.append(unit)
+	
+	return true
+
+func assign_units_to_home() -> bool:
+	for player: Player in players:
+		var home_base: Territory = get_player_home_base(player)
+		for unit: Unit in player.units_owned:
+			if not unit.current_territory:
+				if not assign_unit(unit, home_base):
+					return false
+				print("Assigned unit '%s' to home base territory %s" % [unit.name, home_base.id])
+	return true
 
 func kill_troop(troop: Unit):
 	dead_units.append(troop)

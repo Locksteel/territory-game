@@ -25,6 +25,7 @@ enum CallPriority { LOW, NORM, HIGH }
 
 # Scene templates
 var player_resource_element = preload("res://scenes/templates/player_resource_element.tscn")
+var create_unit_dialog: CreateUnitDialog = preload("res://scenes/dialogs/create_unit_dialog.tscn").instantiate()
 
 #var last_selected_id: int = -1
 
@@ -67,6 +68,9 @@ func _wait_selection() -> void:
 
 
 func _ready() -> void:
+	# Add templates to main scene
+	$CanvasLayer/UI.add_child(create_unit_dialog)
+	
 	$CanvasLayer/SaveLoadUI/LoadDialog.hide()
 	$CanvasLayer/SaveLoadUI/LoadNew/LoadNewContainer/HBoxContainer/Continue.hide()
 	$CanvasLayer/UI/CreatePlayerDialog.hide()
@@ -203,17 +207,15 @@ func select_territory(territory: Territory, additive: bool = false) -> bool:
 	if not additive:
 		selected_territories.clear()
 	
-	if selected_territories:
-		$CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase.hide()
-	else:
-		$CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase.hide()
-	
 	selected_territories.append(territory)
 	emit_signal("territory_selected", territory)
 	#print("Territories selected: " + str(selected_territories))
 	
-	if selected_territories[0].owner == $TerritoryManager.players[0]:
+	if (selected_territories[0].owner == $TerritoryManager.players[0] or
+		selected_territories.size() > 1):
 		$CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase.hide()
+	else:
+		$CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase.show()
 	
 	if current_state == GameplayState.SETUP:
 		update_player_selector($CanvasLayer/UI/TerritoryEditor/VBoxContainer/Player/PlayerSelector)
@@ -518,37 +520,22 @@ func update_unit_selector(
 		name += unit.name
 		
 		selector.add_item(name, unit.id)
-	
-	#if player and territory:
-		#for unit: Unit in player.units_owned:
-			#var name: String = ""
-			#if unit.current_territory == territory and condition.call(unit):
-				#if show_owner:
-					#name += (player.name + ": ")
-				#name += unit.name
-				#selector.add_item(name, unit.id)
-	#elif player:
-		#for unit: Unit in player.units_owned:
-			#if condition.call(unit):
-				#var name: String = ""
-				#if show_owner:
-					#name += (player.name + ": ")
-				#name += unit.name
-				#selector.add_item(name, unit.id)
-	#elif territory:
-		#for unit: Unit in $TerritoryManager.units:
-			#var name: String = ""
-			#if unit.current_territory == territory and condition.call(unit):
-				#selector.add_item(unit.name, unit.id)
-	#else:
-		#for unit: Unit in $TerritoryManager.units:
-			#if condition.call(unit):
-				#selector.add_item(unit.name, unit.id)
 
 
 func _on_edit_players_pressed() -> void:
 	$CanvasLayer/UI/CreatePlayerDialog.popup_centered()
 
+
+func open_unit_dialog(creator: Player) -> Array:
+	create_unit_dialog.creator = creator
+	create_unit_dialog.popup_centered()
+	
+	var result = await create_unit_dialog.done
+	
+	if not result:
+		return []
+	
+	return result
 
 func _on_create_pressed() -> void:
 	if $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerName.text == "" or $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerColor.color == Color.WHITE:
@@ -556,16 +543,40 @@ func _on_create_pressed() -> void:
 		$CanvasLayer/UI/CreatePlayerDialog.hide()
 		return
 	
+	# Create player
 	var new_player = Player.new()
 	new_player.name = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerName.text
 	new_player.color = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerColor.color
-	
-	var units_created = 0
-	for i in $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units/Count.value:
-		# TO-DO: Create unit dialog window
-		print("Creating unit %s" % i)
-	
 	$TerritoryManager.add_player(new_player)
+	
+	print("Player '%s' added to player list" % new_player.name)
+	
+	# Create units
+	var units_created = 0
+	var to_create = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units/Count.value
+	for i in to_create:
+		var unit_info = await open_unit_dialog(new_player)
+		
+		if not unit_info:
+			continue
+		
+		var type = unit_info[0]
+		var name = unit_info[1]
+		if type is not Unit.UnitType or name is not String:
+			print("Invalid unit data returned")
+			continue
+		
+		var new_unit = $TerritoryManager.add_pending_unit(new_player, type, name)
+		if not new_unit:
+			print("Unit creation failed at %s" % i)
+			continue
+		
+		print("Added unit '%s' of type '%s' to player '%s' unit list, pending assignment" %
+				[name, Unit.TYPE_DICT[type], new_player.name])
+		units_created += 1
+	
+	print("Finished creating %s units for player '%s', pending assignment" %
+			[units_created, new_player.name])
 	
 	update_player_count_txt()
 	
@@ -596,11 +607,29 @@ func _on_back_pressed() -> void:
 var current_player: Player
 
 func _on_play_button_pressed() -> void:
+	# Checks
+	
 	if $TerritoryManager.players.size() < 2:
 		REMINDER_TEXT.show_message("Add at least one player to play")
 		return
 	
+	var counts: Dictionary = $TerritoryManager.get_player_territory_counts()
+	for owner: Player in counts.keys():
+		if counts[owner] < 10:
+			REMINDER_TEXT.show_message("All players require at least 10 territories before starting")
+			return
+		
+		var home_base = $TerritoryManager.get_player_home_base(owner)
+		if not home_base:
+			REMINDER_TEXT.show_message("All players require 1 home base to continue")
+			return
+	
 	$CanvasLayer/UI/PlayButton.hide()
+	
+	# Setup
+	
+	$TerritoryManager.assign_units_to_home()
+	
 	deselect_territories()
 	set_map_clickable(false)
 	

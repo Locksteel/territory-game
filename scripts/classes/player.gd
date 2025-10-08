@@ -5,7 +5,8 @@ class_name Player
 @export var name: String = ""
 @export var resources: int = 0
 @export var units_owned: Array[Unit] = []
-# Array of tuples of strings with the format [Sender, Message] (Sender == "Anonymous" if anonymous)
+@export var pending_units: Array[Unit] = []
+# Array of tuples with the format [Sender, Message] (Sender == "Anonymous" if anonymous)
 @export var messages: Array[Array]
 
 @export var pending_requests: Array[ResourceRequest]
