@@ -1,0 +1,65 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1qec2a8eblcj"]
+
+[ext_resource type="Script" path="res://scenes/dialogs/create_unit_dialog.gd" id="1_187rw"]
+[ext_resource type="LabelSettings" uid="uid://cacfsntwvi28w" path="res://fonts/title_label_text.tres" id="2_1364s"]
+[ext_resource type="LabelSettings" uid="uid://bsqfnka11aswk" path="res://fonts/small_label_text.tres" id="2_1817a"]
+
+[node name="CreateUnitDialog" type="Window"]
+position = Vector2i(0, 36)
+size = Vector2i(150, 175)
+visible = false
+min_size = Vector2i(150, 175)
+script = ExtResource("1_187rw")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Header" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Temp Text"
+label_settings = ExtResource("2_1364s")
+
+[node name="Type" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Type"]
+layout_mode = 2
+text = "Unit Type"
+label_settings = ExtResource("2_1817a")
+
+[node name="TypeSelector" type="OptionButton" parent="VBoxContainer/Type"]
+layout_mode = 2
+
+[node name="Name" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Name"]
+layout_mode = 2
+text = "Unit Name"
+label_settings = ExtResource("2_1817a")
+
+[node name="NameEdit" type="LineEdit" parent="VBoxContainer/Name"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Cancel" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="Create" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Create"
+
+[connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Cancel" to="." method="_on_cancel_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Create" to="." method="_on_create_pressed"]

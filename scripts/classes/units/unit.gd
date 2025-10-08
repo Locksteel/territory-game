@@ -42,10 +42,14 @@ const TYPE_DICT: Dictionary = {
 @export var mtn_prepped: bool = false
 
 
-func _init(name: String, territory: Territory) -> void:
+func _init(name: String, territory: Territory = null) -> void:
 	self.id = Globals.generate_unit_id()
 	self.name = name
 	self.current_territory = territory
+
+static func fill_unit_selector(selector: OptionButton) -> void:
+	for type in UnitType.values():
+		selector.add_item(TYPE_DICT[type], type)
 
 
 func move(destination: Territory) -> bool:
