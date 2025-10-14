@@ -26,7 +26,7 @@ const TYPE_DICT: Dictionary = {
 }
 
 @export var id: int = 0
-#@export var name: String = ""
+@export var name: String = ""
 
 @export var current_territory: Territory
 @export var offense: int = 0

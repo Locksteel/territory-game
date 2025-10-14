@@ -85,6 +85,19 @@ func get_player_territory_counts() -> Dictionary:
 	
 	return counts
 
+func get_player_territories(player: Player) -> Array[Territory]:
+	if player not in players:
+		print("Player to get home base not in player list")
+		return []
+	
+	var terr_to_return: Array[Territory] = []
+	
+	for territory: Territory in territories.values():
+		if territory.owner == player:
+			terr_to_return.append(territory)
+	
+	return terr_to_return
+
 func get_player_home_base(player: Player) -> Territory:
 	if player not in players:
 		print("Player to get home base not in player list")

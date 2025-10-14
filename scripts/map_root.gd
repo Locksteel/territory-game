@@ -111,12 +111,12 @@ func _on_continue_pressed() -> void:
 	maps_ready = true
 	$CanvasLayer/SaveLoadUI/LoadNew.hide()
 	
-	set_territory_info()
-	set_player_info()
-	
-	$CanvasLayer/SaveLoadUI/Save.show()
 	$CanvasLayer/UI.show()
 	
+	#await set_territory_info()
+	await set_player_info()
+	
+	$CanvasLayer/SaveLoadUI/Save.show()
 
 
 func get_all_children(node: Node) -> Array[Node]:
@@ -607,6 +607,8 @@ func _on_back_pressed() -> void:
 var current_player: Player
 
 func _on_play_button_pressed() -> void:
+	#var temp_territories = $TerritoryManager.territories
+	
 	# Checks
 	
 	if $TerritoryManager.players.size() < 2:
@@ -727,6 +729,8 @@ func _on_continue_action_pressed() -> void:
 
 # Go to the next turn, returns new turn number or -1 if error
 func turn() -> int:
+	var temp_territories = $TerritoryManager.territories
+	
 	var boxes := {}
 	
 	for child in $CanvasLayer/UI/ActionInfo/VBoxContainer.get_children():
@@ -944,6 +948,17 @@ func turn() -> int:
 							break
 				"fortify":
 						var territory: Territory
+						
+						# Checks
+						# TO-DO: Check if player has enough resources to fortify any of their territories
+						var has_resources: bool = false
+						for cur_terr: Territory in $TerritoryManager.get_player_territories(player):
+							if player.resources >= cur_terr.fortification:
+								has_resources = true
+								break
+						if not has_resources:
+							REMINDER_TEXT.show_message("You don't have enough resources to fortify any territories!")
+							continue
 
 						action_info_label.text = "%s: Fortify a Territory" % player.name
 						boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
