@@ -768,6 +768,7 @@ button_pressed = true
 button_group = ExtResource("16_bwqyw")
 
 [node name="Territory2" type="HBoxContainer" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory"]
+visible = false
 layout_mode = 2
 
 [node name="SelectedTerritory" type="Label" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory2"]

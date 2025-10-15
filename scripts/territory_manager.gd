@@ -83,6 +83,10 @@ func get_player_territory_counts() -> Dictionary:
 		else:
 			counts[territory.owner] += 1
 	
+	for player: Player in players:
+		if player != players[0] and player not in counts.keys():
+			counts[player] = 0
+	
 	return counts
 
 func get_player_territories(player: Player) -> Array[Territory]:
