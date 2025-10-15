@@ -151,8 +151,11 @@ func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, nam
 	if owner not in players:
 		print("Passed player is not in player list")
 		return null
-	if territory not in territories:
+	if territory not in territories.values():
 		print("Passed territory not territory list")
+		return null
+	if owner.resources < Unit.COST_DICT[type]:
+		print("Passed player has insufficient resources")
 		return null
 	
 	var new_unit: Unit = add_pending_unit(owner, type, name)
@@ -160,6 +163,12 @@ func recruit_troop(owner: Player, type: Unit.UnitType, territory: Territory, nam
 		print("Recruitment failed")
 		owner.pending_units.erase(new_unit)
 		return null
+	
+	if owner.pay_for_unit(type) < 0:
+		print("Recuruitment failed due to insufficient resources")
+		return null
+	
+	print("Recruitment success")
 	
 	return new_unit
 

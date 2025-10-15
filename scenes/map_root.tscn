@@ -356,6 +356,19 @@ label_settings = ExtResource("5_qjskx")
 layout_mode = 2
 horizontal_alignment = 1
 
+[node name="Fortification" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Fortification"]
+layout_mode = 2
+text = "Fortification"
+label_settings = ExtResource("5_qjskx")
+
+[node name="Data" type="Label" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer/Fortification"]
+layout_mode = 2
+horizontal_alignment = 1
+
 [node name="HomeBase" type="VBoxContainer" parent="CanvasLayer/UI/TerritoryInspector/VBoxContainer"]
 layout_mode = 2
 mouse_filter = 2
@@ -434,6 +447,20 @@ text = "Starting Units"
 
 [node name="Count" type="SpinBox" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Units"]
 layout_mode = 2
+max_value = 999.0
+value = 10.0
+
+[node name="Resources" type="HBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Resources"]
+layout_mode = 2
+text = "Starting Resources"
+
+[node name="Count" type="SpinBox" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Resources"]
+layout_mode = 2
+max_value = 999.0
+value = 10.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/CreatePlayerDialog/VBoxContainer"]
 layout_mode = 2

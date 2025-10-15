@@ -72,6 +72,19 @@ func dismiss_message(index: int = 0) -> void:
 func dismiss_all_messages() -> void:
 	self.messages.clear()
 
+# Unit recruitment
+# Subtract resources equal to unit's cost
+# Returns amount paid or -1 if failure
+func pay_for_unit(type: Unit.UnitType) -> int:
+	var cost = Unit.COST_DICT[type]
+	
+	if self.resources < cost:
+		print("Player has insufficient resources to recruit unit")
+		return -1
+	
+	self.resources -= cost
+	return cost
+
 # Resource requests
 func request_resources(player: Player, signature: String, amount: int) -> ResourceRequest:
 	var request := ResourceRequest.new(self, signature, amount)

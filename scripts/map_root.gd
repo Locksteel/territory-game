@@ -228,18 +228,23 @@ func select_territory(territory: Territory, additive: bool = false) -> bool:
 		var terrain_index = territory.terrain
 		terrain_selector.select(terrain_index)
 		
+		var fortification = $CanvasLayer/UI/TerritoryEditor/VBoxContainer/Fortification/FortificationBox
+		fortification.value = territory.fortification
+		
 		$CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase.button_pressed = selected_territories[0].home_base
 		
 		$CanvasLayer/UI/TerritoryEditor.show()
 		print("Clicked territory borders: " + str(territory.borders))
 	elif current_state == GameplayState.PLAY:
 		var terrain_string: String = territory.get_terrain_string()
+		var fortification_string: String = str(territory.fortification)
 		var home_base_string: String = "False"
 		
 		if territory.home_base:
 			home_base_string = "True"
 		
 		$CanvasLayer/UI/TerritoryInspector/VBoxContainer/Terrain/Data.text = terrain_string
+		$CanvasLayer/UI/TerritoryInspector/VBoxContainer/Fortification/Data.text = fortification_string
 		$CanvasLayer/UI/TerritoryInspector/VBoxContainer/Player/Data.text = territory.owner.name
 		$CanvasLayer/UI/TerritoryInspector/VBoxContainer/HomeBase/Data.text = home_base_string
 		
@@ -547,6 +552,7 @@ func _on_create_pressed() -> void:
 	var new_player = Player.new()
 	new_player.name = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerName.text
 	new_player.color = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/PlayerColor.color
+	new_player.resources = $CanvasLayer/UI/CreatePlayerDialog/VBoxContainer/Resources/Count.value
 	$TerritoryManager.add_player(new_player)
 	
 	print("Player '%s' added to player list" % new_player.name)
@@ -577,6 +583,7 @@ func _on_create_pressed() -> void:
 	
 	print("Finished creating %s units for player '%s', pending assignment" %
 			[units_created, new_player.name])
+	
 	
 	update_player_count_txt()
 	
@@ -893,7 +900,7 @@ func turn() -> int:
 							# Check if there are any units at all
 							var has_units := false
 							for unit: Unit in $TerritoryManager.units:
-								if unit.current_territory == territory:
+								if unit.current_territory == terr:
 									has_units = true
 									break
 							if not has_units:
@@ -950,10 +957,9 @@ func turn() -> int:
 						var territory: Territory
 						
 						# Checks
-						# TO-DO: Check if player has enough resources to fortify any of their territories
 						var has_resources: bool = false
 						for cur_terr: Territory in $TerritoryManager.get_player_territories(player):
-							if player.resources >= cur_terr.fortification:
+							if cur_terr.can_fortify():
 								has_resources = true
 								break
 						if not has_resources:
@@ -1051,7 +1057,7 @@ func turn() -> int:
 							# Check if there are any units at all
 							var has_units := false
 							for unit: Unit in $TerritoryManager.units:
-								if unit.current_territory == territory:
+								if unit.current_territory == terr:
 									has_units = true
 									break
 							if not has_units:
@@ -1110,6 +1116,11 @@ func turn() -> int:
 
 						if outcome.type == "territory":
 							var terr: Territory = outcome.territory
+							
+							if terr.owner != player:
+								REMINDER_TEXT.show_message("You do not own that territory!")
+								continue
+							
 							territory = terr
 
 							boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Territory " + str(territory.id)
@@ -1132,7 +1143,7 @@ func turn() -> int:
 								name = Unit.TYPE_DICT[unit_type]
 							
 							
-							if unit_type and territory and name:
+							if territory and name:
 								calls.append(Callable($TerritoryManager, "recruit_troop").bind(player, unit_type, territory, name))
 								priority = CallPriority.NORM
 								
@@ -1260,7 +1271,7 @@ func turn() -> int:
 							# Check if there are any units at all
 							var has_units := false
 							for unit: Unit in $TerritoryManager.units:
-								if unit.current_territory == territory:
+								if unit.current_territory == terr:
 									has_units = true
 									break
 							if not has_units:
@@ -1731,6 +1742,10 @@ func turn() -> int:
 			calls.clear()
 	
 	run_actions()
+	
+	#var territories = $TerritoryManager.territories
+	#var players = $TerritoryManager.players
+	#var units = $TerritoryManager.units
 	
 	$TerritoryManager.turn += 1
 	return $TerritoryManager.turn

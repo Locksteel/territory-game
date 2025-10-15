@@ -36,6 +36,12 @@ func check_independence() -> bool:
 		return true
 	return false
 
+# Returns whether this territory's owner can fortify it
+func can_fortify() -> bool:
+	if self.owner.resources >= self.fortification:
+		return true
+	return false
+
 # Adds passed fortification at resource cost
 # Returns whether fortification was added
 func fortify(amount: int = 1) -> bool:
