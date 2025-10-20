@@ -692,8 +692,7 @@ func fill_player_actions(player: Player) -> void:
 	player.actions["sign"] = false
 	player.actions["break"] = false
 	player.actions["request"] = false
-	player.actions["deny"] = false
-	player.actions["fulfill"] = false
+	player.actions["respond"] = false
 
 func _on_player_selector_action_item_selected(index: int) -> void:
 	set_player_actions(current_player)
@@ -720,8 +719,7 @@ func _on_player_selector_action_item_selected(index: int) -> void:
 	$CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer/Sign.button_pressed = current_player.actions["sign"]
 	$CanvasLayer/UI/ActionPanel/VBoxContainer/Treaties/HBoxContainer/Break.button_pressed = current_player.actions["break"]
 	$CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Request.button_pressed = current_player.actions["request"]
-	$CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Deny.button_pressed = current_player.actions["deny"]
-	$CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Fulfill.button_pressed = current_player.actions["fulfill"]
+	$CanvasLayer/UI/ActionPanel/VBoxContainer/ResourceRequests/HBoxContainer/Respond.button_pressed = current_player.actions["respond"]
 
 func _on_continue_action_pressed() -> void:
 	$CanvasLayer/UI/ActionPanel.visible = false

@@ -37,8 +37,7 @@ func _init() -> void:
 	self.actions["sign"] = false
 	self.actions["break"] = false
 	self.actions["request"] = false
-	self.actions["deny"] = false
-	self.actions["fulfill"] = false
+	self.actions["respond"] = false
 
 func sign_treaty(ally: Player) -> void:
 	self.allies.append(ally)
