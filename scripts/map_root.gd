@@ -1488,7 +1488,7 @@ func turn() -> int:
 							# Check if there are enough friendly units on territory
 							var friendly_unit_count := 0
 							for unit: Unit in $TerritoryManager.units:
-								if (unit.current_territory == territory and
+								if (unit.current_territory == terr and
 									$TerritoryManager.get_unit_owner(unit) == player
 								):
 									friendly_unit_count += 1
@@ -1511,9 +1511,6 @@ func turn() -> int:
 							if not territory:
 								REMINDER_TEXT.show_message("Select a territory first")
 								continue
-							if not (name and $TerritoryManager.unique_name(name)):
-								REMINDER_TEXT.show_message("Enter a unique name")
-								continue
 
 							var unit1_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
 							var unit1_temp: Unit = $TerritoryManager.get_unit_by_id(unit1_id)
@@ -1532,8 +1529,9 @@ func turn() -> int:
 							unit1 = unit1_temp
 							unit2 = unit2_temp
 							
+							var units: Array[Unit] = [unit1, unit2]
 							
-							calls.append(Callable($TerritoryManager, "band_troops").bind([unit1, unit2], name))
+							calls.append(Callable($TerritoryManager, "band_troops").bind(units, name))
 							priority = CallPriority.LOW
 							
 							print("Units '%s' and '%s' owned by %s, band into '%s'" % [unit1.name, unit2.name, player.name, name])
@@ -1743,9 +1741,9 @@ func turn() -> int:
 	
 	run_actions()
 	
-	#var territories = $TerritoryManager.territories
-	#var players = $TerritoryManager.players
-	#var units = $TerritoryManager.units
+	var territories = $TerritoryManager.territories
+	var players = $TerritoryManager.players
+	var units = $TerritoryManager.units
 	
 	$TerritoryManager.turn += 1
 	return $TerritoryManager.turn

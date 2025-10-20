@@ -225,6 +225,13 @@ func band_troops(troops: Array[Unit], band_name: String) -> Band:
 		print("Banding failed")
 		return null
 	
+	# Remove old units
+	for troop in troops:
+		units.erase(troop)
+	
+	# Add band unit
+	units.append(band)
+	
 	return band
 
 # Check if enemy spy is on territory
