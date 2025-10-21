@@ -198,6 +198,20 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "Play Game"
 
+[node name="NextTurnButton" type="Button" parent="CanvasLayer/UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -90.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Next Turn"
+
 [node name="TerritorySetup" type="PanelContainer" parent="CanvasLayer/UI"]
 visible = false
 layout_mode = 0
@@ -910,6 +924,7 @@ text = "Continue"
 [connection signal="file_selected" from="CanvasLayer/SaveLoadUI/SaveDialog" to="." method="_on_save_dialog_file_selected"]
 [connection signal="file_selected" from="CanvasLayer/SaveLoadUI/LoadStateDialog" to="." method="_on_load_state_dialog_file_selected"]
 [connection signal="pressed" from="CanvasLayer/UI/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/NextTurnButton" to="." method="_on_next_turn_button_pressed"]
 [connection signal="toggled" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HomeBase" to="." method="_on_home_base_toggled"]
 [connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/EditPlayers" to="." method="_on_edit_players_pressed"]
 [connection signal="pressed" from="CanvasLayer/UI/TerritoryEditor/VBoxContainer/HBoxContainer/Apply" to="." method="_on_apply_pressed"]

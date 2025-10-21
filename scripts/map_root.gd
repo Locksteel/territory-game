@@ -644,7 +644,18 @@ func _on_play_button_pressed() -> void:
 	
 	update_player_selector($CanvasLayer/UI/ActionPanel/VBoxContainer/Player/PlayerSelector, true)
 	current_player = $TerritoryManager.players[1]
-	$CanvasLayer/UI/ActionPanel.visible = true
+	$CanvasLayer/UI/ActionPanel.show()
+
+func _on_next_turn_button_pressed() -> void:
+	$CanvasLayer/UI/NextTurnButton.hide()
+	
+	deselect_territories()
+	set_map_clickable(false)
+	
+	update_player_selector($CanvasLayer/UI/ActionPanel/VBoxContainer/Player/PlayerSelector, true)
+	current_player = $TerritoryManager.players[1]
+	$CanvasLayer/UI/ActionPanel.show()
+
 
 func set_player_actions(player: Player) -> void:
 	var action_dict: Dictionary = {}
@@ -728,7 +739,8 @@ func _on_continue_action_pressed() -> void:
 	current_state = GameplayState.PLAY
 	set_map_clickable(true)
 	
-	turn()
+	var turn_num = await turn()
+	print("Completed actions, moving to turn " + str(turn_num))
 	
 
 
@@ -1742,6 +1754,8 @@ func turn() -> int:
 	var territories = $TerritoryManager.territories
 	var players = $TerritoryManager.players
 	var units = $TerritoryManager.units
+	
+	$CanvasLayer/UI/NextTurnButton.show()
 	
 	$TerritoryManager.turn += 1
 	return $TerritoryManager.turn
