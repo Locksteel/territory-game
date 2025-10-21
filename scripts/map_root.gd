@@ -1400,6 +1400,14 @@ func turn() -> int:
 					if not player.units_owned:
 						REMINDER_TEXT.show_message("You can't unstation with no units!")
 						continue
+					# Check if player has any stationed units
+					var has_stationed = false
+					for unit in player.units_owned:
+						if unit.stationed:
+							has_stationed = true
+					if not has_stationed:
+						REMINDER_TEXT.show_message("You can't unstation with no stationed units!")
+						continue
 
 					action_info_label.text = "%s: Unstation a Unit" % player.name
 					boxes["Territory"].get_node("Territory1/SelectedTerritory").text = "Choose a Territory"
@@ -1447,14 +1455,14 @@ func turn() -> int:
 								continue
 
 							var friendly_id: int = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_selected_id()
-							var friendly_name: String = boxes["FriendlyUnit"].get_node("FriendlyUnitSelector").get_item_text(friendly_id)
+							var friendly: Unit = $TerritoryManager.get_unit_by_id(friendly_id)
 
-							if friendly_name == "":
+							if not friendly:
 								REMINDER_TEXT.show_message("Select a friendly unit before continuing")
 								continue
 
 							# Find friendly unit
-							target = $TerritoryManager.get_unit_by_name(friendly_name, player)
+							target = friendly
 
 							if target:
 								calls.append(Callable(target, "unstation").bind(territory))
