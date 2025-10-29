@@ -4,7 +4,7 @@ extends Node
 
 var territories: Dictionary = {}
 var players: Array[Player] = []
-var units: Array[Unit] = []
+var units: Array = []
 var turn: int = 0
 
 var dead_units: Array[Unit] = []
@@ -259,13 +259,14 @@ func uncover(territory: Territory) -> int:
 
 func save_game_state(path: String, map_display: Image, map_index: Image) -> bool:
 	var state = GameState.new()
-	state.players = players.duplicate(true)
-	state.territories = territories.duplicate(true)
-	state.units = units.duplicate(true)
+	state.players = players
+	state.territories = territories
+	state.units = units
 	state.next_unit_id = Globals.next_unit_id
 	state.current_turn = turn
-	state.priority_queue = priority_action_queue.duplicate(true)
-	state.action_queue = action_queue.duplicate(true)
+	#state.priority_queue = priority_action_queue
+	#state.action_queue = action_queue
+	#state.last_queue = last_action_queue
 	state.map_display = map_display
 	state.map_index = map_index
 	
@@ -277,15 +278,18 @@ func save_game_state(path: String, map_display: Image, map_index: Image) -> bool
 	return true
 
 func load_game_state(path: String) -> GameState:
-	var loaded = ResourceLoader.load(path)
+	var loaded: GameState = ResourceLoader.load(path)
+	print(loaded, loaded.get_class(), loaded.units)
+	
 	if loaded and loaded is GameState:
-		players = loaded.players.duplicate(true)
-		territories = loaded.territories.duplicate(true)
-		units = loaded.units.duplicate(true)
+		players = loaded.players
+		territories = loaded.territories
+		units = loaded.units
 		Globals.next_unit_id = loaded.next_unit_id
 		turn = loaded.current_turn
-		priority_action_queue = loaded.priority_queue.duplicate(true)
-		action_queue = loaded.action_queue.duplicate(true)
+		#priority_action_queue = loaded.priority_queue
+		#action_queue = loaded.action_queue
+		#last_action_queue = loaded.last_queue
 		
 		return loaded
 	else:

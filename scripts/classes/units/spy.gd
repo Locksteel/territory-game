@@ -14,7 +14,7 @@ class_name Spy
 @export var last_assessed: Territory
 @export var assess_count: int = 0
 
-func _init(name: String, territory: Territory) -> void:
+func _init(name: String = "", territory: Territory = null) -> void:
 	super(name, territory)
 	self.offense = 1
 	self.defense = 1

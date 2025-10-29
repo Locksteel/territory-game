@@ -817,7 +817,6 @@ layout_mode = 2
 text = "Other territory placeholder"
 
 [node name="Enable" type="CheckBox" parent="CanvasLayer/UI/ActionInfo/VBoxContainer/Territory/Territory2"]
-visible = false
 layout_mode = 2
 button_group = ExtResource("16_bwqyw")
 

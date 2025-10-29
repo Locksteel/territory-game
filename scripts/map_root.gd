@@ -113,10 +113,8 @@ func _on_continue_pressed() -> void:
 	
 	$CanvasLayer/UI.show()
 	
-	#await set_territory_info()
+	await set_territory_info(0)
 	await set_player_info()
-	
-	$CanvasLayer/SaveLoadUI/Save.show()
 
 
 func get_all_children(node: Node) -> Array[Node]:
@@ -270,7 +268,9 @@ func deselect_territories(territory: Territory = null):
 	$CanvasLayer/UI/TerritoryEditor.hide()
 	$CanvasLayer/UI/TerritoryInspector.hide()
 
-func set_territory_info() -> void:
+# Sets information for all territories, or up to a maximum number
+# Maximum set to -1 to set all territory info (testing only)
+func set_territory_info(max: int = -1) -> void:
 	var prev_state: GameplayState = current_state
 	current_state = GameplayState.MAPFILL
 	
@@ -279,6 +279,7 @@ func set_territory_info() -> void:
 	$CanvasLayer/UI/TerritorySetup/VBoxContainer/Label.text = "Select Bordering Territories"
 	$CanvasLayer/UI/TerritorySetup.show()
 	
+	var terr_count = 0
 	for territory_id in $TerritoryManager.territories:
 		var territory: Territory = $TerritoryManager.get_territory_by_id(territory_id)
 		territory_setting = territory
@@ -304,6 +305,12 @@ func set_territory_info() -> void:
 		
 		print("Set territory %s traits:\n*Terrain: %s\n*Fortification: %s\n*Bordering Territories: %s" %
 			  [territory.id, territory.get_terrain_string(), str(territory.fortification), str(territory.borders)])
+		
+		terr_count += 1
+		if terr_count >= 0 and terr_count >= max:
+			break
+	
+	print("Successfully set %s territories" % terr_count)
 	
 	current_state = prev_state
 	territory_setting = null
@@ -479,7 +486,6 @@ func _on_load_state_dialog_file_selected(path: String) -> void:
 	#generate_territories_from_image()
 	maps_ready = true
 	$CanvasLayer/SaveLoadUI/MainLoad.hide()
-	$CanvasLayer/SaveLoadUI/Save.show()
 	$CanvasLayer/UI.show()
 
 
@@ -644,6 +650,7 @@ func _on_play_button_pressed() -> void:
 	
 	update_player_selector($CanvasLayer/UI/ActionPanel/VBoxContainer/Player/PlayerSelector, true)
 	current_player = $TerritoryManager.players[1]
+	$CanvasLayer/SaveLoadUI/Save.hide()
 	$CanvasLayer/UI/ActionPanel.show()
 
 func _on_next_turn_button_pressed() -> void:
@@ -1181,7 +1188,7 @@ func turn() -> int:
 					boxes["FriendlyUnit"].show()
 					boxes["Territory"].show()
 					boxes["Territory"].get_node("Territory1/Enable").show()
-					boxes["Territory"].get_node("Territory2/Enable").show()
+					boxes["Territory"].get_node("Territory2").show()
 					action_info.show()
 
 					while true:
@@ -1241,6 +1248,9 @@ func turn() -> int:
 							if friendly not in player.units_owned:
 								REMINDER_TEXT.show_message("Invalid unit selection, please try again")
 								continue
+							
+							# Hide second territory selector
+							boxes["Territory"].get_node("Territory2").hide()
 
 							# Find unit to move
 							target = friendly
@@ -1764,6 +1774,7 @@ func turn() -> int:
 	var units = $TerritoryManager.units
 	
 	$CanvasLayer/UI/NextTurnButton.show()
+	$CanvasLayer/SaveLoadUI/Save.show()
 	
 	$TerritoryManager.turn += 1
 	return $TerritoryManager.turn

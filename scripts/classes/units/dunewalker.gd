@@ -11,7 +11,7 @@ class_name Dunewalker
 #@export var cost: int = 0
 #@export var defending: bool = false
 
-func _init(name: String, territory: Territory) -> void:
+func _init(name: String = "", territory: Territory = null) -> void:
 	super(name, territory)
 	self.offense = 2
 	self.defense = 1

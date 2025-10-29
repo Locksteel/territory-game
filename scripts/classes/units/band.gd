@@ -3,7 +3,7 @@ class_name Band
 
 @export var members: Array[Unit] = []
 
-func _init(name: String, territory: Territory) -> void:
+func _init(name: String = "", territory: Territory = null) -> void:
 	super(name, territory)
 	# self.band == self implies unit is a band itself
 	self.band_unit = self

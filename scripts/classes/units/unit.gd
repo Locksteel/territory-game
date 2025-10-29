@@ -45,7 +45,7 @@ static func fill_unit_selector(selector: OptionButton) -> void:
 		selector.add_item(TYPE_DICT[type], type)
 
 
-func _init(name: String, territory: Territory = null) -> void:
+func _init(name: String = "", territory: Territory = null) -> void:
 	self.id = Globals.generate_unit_id()
 	self.name = name
 	self.current_territory = territory
